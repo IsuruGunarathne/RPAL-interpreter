@@ -30,7 +30,7 @@ public:
      * @brief Constructs a Lexer object with the given input string.
      * @param input The input string to tokenize.
      */
-    Lexer(const std::string &input) : input(input), currentPosition(0) {}
+    Lexer(const std::string &input) : input(input), currPosition(0) {}
 
     /**
      * @brief Retrieves the next token from the input string.
@@ -39,91 +39,91 @@ public:
     Token getNextToken() {
         skipWhitespace();
 
-        if (currentPosition >= input.length()) {
+        if (currPosition >= input.length()) {
             // Check if it is the last empty line or end of input
-            if (currentPosition == input.length())
-                return {token_type::END_OF_FILE, ""};
+            if (currPosition == input.length())
+                return {type_of_token::END_OF_FILE, ""};
             else
-                return {token_type::DELIMITER, ""};
+                return {type_of_token::DELIMITER, ""};
         }
 
-        char currentChar = input[currentPosition++];
+        char currentChar = input[currPosition++];
 
         if (isalpha(currentChar)) {
             std::stringstream ss;
             ss << currentChar;
-            while (currentPosition < input.length() &&
-                   (isalnum(input[currentPosition]) || input[currentPosition] == '_')) {
-                ss << input[currentPosition++];
+            while (currPosition < input.length() &&
+                   (isalnum(input[currPosition]) || input[currPosition] == '_')) {
+                ss << input[currPosition++];
             }
             std::string identifier = ss.str();
 
             // Check if the identifier is a keyword
             if (keywords.count(identifier) > 0) {
-                return {token_type::KEYWORD, identifier};
+                return {type_of_token::KEYWORD, identifier};
             } else if (operators.count(identifier) > 0) {
-                return {token_type::OPERATOR, identifier};
+                return {type_of_token::OPERATOR, identifier};
             } else if (booleanValues.count(identifier) > 0) {
                 if (identifier == "true")
-                    return {token_type::INTEGER, "1"};
+                    return {type_of_token::INTEGER, "1"};
                 else
-                    return {token_type::INTEGER, "0"};
+                    return {type_of_token::INTEGER, "0"};
             }
 
-            return {token_type::IDENTIFIER, identifier};
+            return {type_of_token::IDENTIFIER, identifier};
         } else if (isdigit(currentChar)) {
             std::stringstream ss;
             ss << currentChar;
-            while (currentPosition < input.length() && isdigit(input[currentPosition])) {
-                ss << input[currentPosition++];
+            while (currPosition < input.length() && isdigit(input[currPosition])) {
+                ss << input[currPosition++];
             }
             std::string number = ss.str();
-            return {token_type::INTEGER, number};
+            return {type_of_token::INTEGER, number};
         } else if (currentChar == '/') {
-            if (currentPosition < input.length() && input[currentPosition] == '/') {
+            if (currPosition < input.length() && input[currPosition] == '/') {
                 // Skip single-line comment
-                while (currentPosition < input.length() && input[currentPosition] != '\n') {
-                    currentPosition++;
+                while (currPosition < input.length() && input[currPosition] != '\n') {
+                    currPosition++;
                 }
                 // Recursively call getNextToken to get the next valid token
                 return getNextToken();
             } else if (isOperatorSymbol(currentChar)) {
                 std::stringstream ss;
                 ss << currentChar;
-                while (currentPosition < input.length() && isOperatorSymbol(input[currentPosition])) {
-                    ss << input[currentPosition++];
+                while (currPosition < input.length() && isOperatorSymbol(input[currPosition])) {
+                    ss << input[currPosition++];
                 }
                 std::string op = ss.str();
-                return {token_type::OPERATOR, op};
+                return {type_of_token::OPERATOR, op};
             } else {
                 std::cerr << "Error: Unknown token encountered" << std::endl;
-                return {token_type::END_OF_FILE, ""};
+                return {type_of_token::END_OF_FILE, ""};
             }
         } else if (isOperatorSymbol(currentChar)) {
             std::stringstream ss;
             ss << currentChar;
 
             if (ss.str() == ",") {
-                return {token_type::OPERATOR, ss.str()};
+                return {type_of_token::OPERATOR, ss.str()};
             }
 
-            while (currentPosition < input.length() && isOperatorSymbol(input[currentPosition])) {
-                ss << input[currentPosition++];
+            while (currPosition < input.length() && isOperatorSymbol(input[currPosition])) {
+                ss << input[currPosition++];
             }
             std::string op = ss.str();
-            return {token_type::OPERATOR, op};
+            return {type_of_token::OPERATOR, op};
         } else if (currentChar == '\'' || currentChar == '"') {
             bool isSingleQuote = currentChar == '\'';
 
             std::stringstream ss;
 //            ss << currentChar;
-            while (currentPosition < input.length()) {
-                currentChar = input[currentPosition++];
+            while (currPosition < input.length()) {
+                currentChar = input[currPosition++];
                 if (currentChar == '\'' && isSingleQuote || currentChar == '"' && !isSingleQuote) {
 //                    ss << currentChar;
                     break;
                 } else if (currentChar == '\\') {
-                    currentChar = input[currentPosition++];
+                    currentChar = input[currPosition++];
                     switch (currentChar) {
                         case 't':
                             ss << '\t';
@@ -146,13 +146,13 @@ public:
                 }
             }
             std::string str = ss.str();
-            return {token_type::STRING, str};
+            return {type_of_token::STRING, str};
         } else if (currentChar == '(' || currentChar == ')') {
             std::string delimiter(1, currentChar);
-            return {token_type::DELIMITER, delimiter};
+            return {type_of_token::DELIMITER, delimiter};
         } else {
             std::cerr << "Error: Unknown token encountered" << std::endl;
-            return {token_type::END_OF_FILE, ""};
+            return {type_of_token::END_OF_FILE, ""};
         }
     }
 
@@ -161,8 +161,8 @@ private:
      * @brief Skips whitespace characters in the input string.
      */
     void skipWhitespace() {
-        while (currentPosition < input.length() && isspace(input[currentPosition])) {
-            currentPosition++;
+        while (currPosition < input.length() && isspace(input[currPosition])) {
+            currPosition++;
         }
     }
 
@@ -178,7 +178,7 @@ private:
 
 private:
     std::string input;
-    size_t currentPosition;
+    size_t currPosition;
 };
 
 #endif // LEXER_H

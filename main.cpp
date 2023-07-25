@@ -7,18 +7,20 @@
 #include "Token.h"
 #include "CSE.h"
 
-// Map the enum values to their string representations
-std::unordered_map<token_type, std::string> token_typeNames = {
-    {token_type::IDENTIFIER, "IDENTIFIER"},
-    {token_type::INTEGER, "INTEGER"},
-    {token_type::STRING, "STRING"},
-    {token_type::OPERATOR, "OPERATOR"},
-    {token_type::DELIMITER, "DELIMITER"},
-    {token_type::KEYWORD, "KEYWORD"},
-    {token_type::END_OF_FILE, "END_OF_FILE"}};
+using namespace std;
 
-// Function to get the string representation of the token_type
-std::string gettoken_typeName(token_type type)
+// Map the enum values to their string representations
+std::unordered_map<type_of_token, std::string> token_typeNames = {
+    {type_of_token::IDENTIFIER, "IDENTIFIER"},
+    {type_of_token::INTEGER, "INTEGER"},
+    {type_of_token::STRING, "STRING"},
+    {type_of_token::OPERATOR, "OPERATOR"},
+    {type_of_token::DELIMITER, "DELIMITER"},
+    {type_of_token::KEYWORD, "KEYWORD"},
+    {type_of_token::END_OF_FILE, "END_OF_FILE"}};
+
+// Function to get the string representation of the type_of_token
+std::string gettoken_typeName(type_of_token type)
 {
     if (token_typeNames.count(type) > 0)
     {
@@ -82,7 +84,7 @@ int generateDotFileHelper(CustomTreeNode *node, std::ofstream &file, int parent 
     std::string valueColor = "darkgreen";
     std::string fillColor = (node->getValue() == " " || node->getValue().empty()) ? "#CCCCCC" : "#FFFFFF";
 
-    // Escape nodeLabel characters if necessary
+    // Escape labelOfNode characters if necessary
     std::string escapedLabel = node->getLabel();
 
     size_t pos1 = escapedLabel.find('&');
@@ -99,7 +101,7 @@ int generateDotFileHelper(CustomTreeNode *node, std::ofstream &file, int parent 
         pos = escapedLabel.find('>', pos + 4);
     }
 
-    // Prepare nodeLabel and value strings for the dot file
+    // Prepare labelOfNode and value strings for the dot file
     std::string labelStr = (escapedLabel.empty()) ? "&nbsp;" : escapedLabel;
     std::string valueStr = (node->getValue().empty()) ? "&nbsp;" : node->getValue();
 
@@ -112,7 +114,7 @@ int generateDotFileHelper(CustomTreeNode *node, std::ofstream &file, int parent 
     }
 
     // Write the node details to the dot file
-    file << "    node" << currentNode << " [nodeLabel=<";
+    file << "    node" << currentNode << " [labelOfNode=<";
     file << "<font color=\"" << labelColor << "\">" << labelStr << "</font><br/>";
     file << "<font color=\"" << valueColor << "\">" << valueStr << "</font>";
     file << ">, style=filled, fillcolor=\"" << fillColor << "\"];\n";
@@ -213,7 +215,7 @@ int main(int argc, char *argv[])
 //    {
 //        token = TokenStorage::getInstance().pop();
 //        std::cout << "Type: " << gettoken_typeName(token.type) << ", Value: " << token.value << std::endl;
-//    } while (token.type != token_type::END_OF_FILE);
+//    } while (token.type != type_of_token::END_OF_FILE);
 //
 //    TokenStorage::getInstance().reset();
 

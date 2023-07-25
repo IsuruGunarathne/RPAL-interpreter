@@ -6,7 +6,7 @@
 /**
  * Types of tokens are enumerated.
  */
-enum token_type
+enum type_of_token
 {
     IDENTIFIER, // A token that represents an identifier 
     INTEGER,    // A token that represents an integer
@@ -21,7 +21,7 @@ enum token_type
  */
 struct Token
 {
-    token_type type;       // The type of the token
+    type_of_token type;       // The type of the token
     std::string nodeValue; // The nodeValue of the token
 };
 

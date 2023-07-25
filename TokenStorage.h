@@ -90,7 +90,7 @@ public:
      * Clears the tokens vector and sets the lexer to nullptr.
      * Called when the TokenStorage instance is no longer needed.
      */
-    static void clearInstance()
+    static void destroyInstance()
     {
         instance.lexer = 0;
         instance.tokens.clear();

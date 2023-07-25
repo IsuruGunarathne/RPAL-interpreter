@@ -16,7 +16,7 @@
 class CustomTreeNode
 {
 private:
-    std::string nodeLabel;                // The nodeLabel of the node
+    std::string labelOfNode;                // The labelOfNode of the node
     std::vector<CustomTreeNode *> children; // The child nodes of the current node
     std::string nodeValue;                // The nodeValue associated with the node
 
@@ -25,7 +25,7 @@ public:
      * @brief Constructs a CustomTreeNode object with the specified label.
      * @param label The label of the node.
      */
-    explicit CustomTreeNode(std::string l) : nodeLabel(std::move(l))
+    explicit CustomTreeNode(std::string l) : labelOfNode(std::move(l))
     {
         children = std::vector<CustomTreeNode *>();
     }
@@ -56,12 +56,12 @@ public:
         return children.size();
     }
         /**
-     * @brief Returns the nodeLabel of the node.
-     * @return The nodeLabel of the node as a string.
+     * @brief Returns the labelOfNode of the node.
+     * @return The labelOfNode of the node as a string.
      */
     std::string getLabel() const
     {
-        return nodeLabel;
+        return labelOfNode;
     }
         /**
      * @brief Returns a reference to the vector of child nodes.
@@ -133,8 +133,8 @@ class InternalNode : public CustomTreeNode
 {
 public:
     /**
-     * @brief Constructs an InternalNode object with the specified nodeLabel and nodeValue.
-     * @param l The nodeLabel of the internal node.
+     * @brief Constructs an InternalNode object with the specified labelOfNode and nodeValue.
+     * @param l The labelOfNode of the internal node.
      * @param v The nodeValue associated with the internal node.
      */
     InternalNode(const std::string &l, const std::string &v = " ") : CustomTreeNode(l)
@@ -150,8 +150,8 @@ class LeafNode : public CustomTreeNode
 {
 public:
     /**
-     * @brief Constructs a LeafNode object with the specified nodeLabel and nodeValue.
-     * @param l The nodeLabel of the leaf node.
+     * @brief Constructs a LeafNode object with the specified labelOfNode and nodeValue.
+     * @param l The labelOfNode of the leaf node.
      * @param v The nodeValue associated with the leaf node.
      */
     LeafNode(const std::string &l, const std::string &v) : CustomTreeNode(l)

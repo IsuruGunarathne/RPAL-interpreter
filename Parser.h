@@ -49,7 +49,7 @@ public:
         Token token = tokenStorage.top();
 
         // Check if the input token is the end of file token
-        if (token.type == token_type::END_OF_FILE)
+        if (token.type == type_of_token::END_OF_FILE)
         {
             return; // No further parsing required, return from the function
         }
@@ -58,7 +58,7 @@ public:
             E(); // Start parsing the expression
 
             // Check if the next token is the end of file token
-            if (tokenStorage.top().type == token_type::END_OF_FILE)
+            if (tokenStorage.top().type == type_of_token::END_OF_FILE)
             {
                 // Set the root of the AST to the last node in the nodeStack
                 CustomTree::getInstance().setASTRoot(Parser::nodeStack.back());
@@ -75,25 +75,25 @@ public:
 std::vector<CustomTreeNode *> Parser::nodeStack;
 
 /**
- * Constructs a new CustomTreeNode with the specified nodeLabel, number of children, leaf status, and nodeValue.
+ * Constructs a new CustomTreeNode with the specified labelOfNode, number of children, leaf status, and nodeValue.
  * Adds the constructed node to the nodeStack.
- * @param nodeLabel The nodeLabel of the node.
+ * @param labelOfNode The labelOfNode of the node.
  * @param num The number of children the node will have.
  * @param isLeaf A boolean indicating whether the node is a leaf node or not.
  * @param nodeValue The nodeValue associated with the node (only applicable for leaf nodes).
  */
-void build_tree(const std::string &nodeLabel, const int &num, const bool isLeaf, const std::string &nodeValue = "")
+void build_tree(const std::string &labelOfNode, const int &num, const bool isLeaf, const std::string &nodeValue = "")
 {
     CustomTreeNode *node;
 
     // Create a leaf node if isLeaf is true, otherwise create an internal node
     if (isLeaf)
     {
-        node = new LeafNode(nodeLabel, nodeValue);
+        node = new LeafNode(labelOfNode, nodeValue);
     }
     else
     {
-        node = new InternalNode(nodeLabel);
+        node = new InternalNode(labelOfNode);
     }
 
     // Add the children from the nodeStack to the newly created node
@@ -148,7 +148,7 @@ void E()
         int n = 0;
 
         // Process identifiers until a non-identifier token is encountered
-        while (tokenStorage.top().type == token_type::IDENTIFIER)
+        while (tokenStorage.top().type == type_of_token::IDENTIFIER)
         {
             Vb();
             n++;
@@ -511,7 +511,7 @@ void Ap()
         tokenStorage.pop();
 
         // Check for identifier token
-        if (tokenStorage.top().type == token_type::IDENTIFIER)
+        if (tokenStorage.top().type == type_of_token::IDENTIFIER)
         {
             Token token = tokenStorage.pop();
             build_tree("identifier", 0, true, token.nodeValue);
@@ -539,7 +539,7 @@ void R()
     Rn();
 
     Token top = tokenStorage.top();
-    while (top.type == token_type::IDENTIFIER || top.type == token_type::INTEGER || top.type == token_type::STRING || top.nodeValue == "true" || top.nodeValue == "false" || top.nodeValue == "nil" || top.nodeValue == "(" || top.nodeValue == "dummy")
+    while (top.type == type_of_token::IDENTIFIER || top.type == type_of_token::INTEGER || top.type == type_of_token::STRING || top.nodeValue == "true" || top.nodeValue == "false" || top.nodeValue == "nil" || top.nodeValue == "(" || top.nodeValue == "dummy")
     {
         Rn();
         top = tokenStorage.top();
@@ -559,19 +559,19 @@ void Rn()
     TokenStorage &tokenStorage = TokenStorage::getInstance();
     Token top = tokenStorage.top();
 
-    if (top.type == token_type::IDENTIFIER)
+    if (top.type == type_of_token::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
         build_tree("identifier", 0, true, token.nodeValue);
     }
-    else if (top.type == token_type::INTEGER)
+    else if (top.type == type_of_token::INTEGER)
     {
         // Parse Integer
         Token token = tokenStorage.pop();
         build_tree("integer", 0, true, token.nodeValue);
     }
-    else if (top.type == token_type::STRING)
+    else if (top.type == type_of_token::STRING)
     {
         // Parse String
         Token token = tokenStorage.pop();
@@ -712,7 +712,7 @@ void Db()
             throw std::runtime_error("Syntax Error: ')' expected");
         }
     }
-    else if (tokenStorage.top().type == token_type::IDENTIFIER)
+    else if (tokenStorage.top().type == type_of_token::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
@@ -738,7 +738,7 @@ void Db()
         {
             int n = 0;
 
-            while (tokenStorage.top().nodeValue != "=" && tokenStorage.top().type == token_type::IDENTIFIER)
+            while (tokenStorage.top().nodeValue != "=" && tokenStorage.top().type == type_of_token::IDENTIFIER)
             {
                 Vb();
                 n++;
@@ -807,7 +807,7 @@ void Vb()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
-    if (tokenStorage.top().type == token_type::IDENTIFIER)
+    if (tokenStorage.top().type == type_of_token::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
@@ -822,7 +822,7 @@ void Vb()
             tokenStorage.pop();
             build_tree("()", 0, true);
         }
-        else if (tokenStorage.top().type == token_type::IDENTIFIER)
+        else if (tokenStorage.top().type == type_of_token::IDENTIFIER)
         {
             // Parse Identifier
             Token token = tokenStorage.pop();
@@ -869,7 +869,7 @@ void Vl()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
-    if (tokenStorage.top().type == token_type::IDENTIFIER)
+    if (tokenStorage.top().type == type_of_token::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
