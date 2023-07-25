@@ -1,48 +1,46 @@
 #ifndef RPAL_CLION_PARSER_H
 #define RPAL_CLION_PARSER_H
-
+#include <vector>
 #include "Token.h"
 #include "Lexer.h"
 #include "TokenStorage.h"
 #include "Tree.h"
 #include "TreeNode.h"
 
-#include <vector>
 
-// function prototypes
-void E();
-void Ew();
-void T();
-void Ta();
-void Tc();
-void B();
-void Bt();
-void Bs();
-void Bp();
-void A();
-void At();
-void Af();
-void Ap();
-void R();
-void Rn();
-void D();
-void Da();
-void Dr();
-void Db();
-void Vb();
-void Vl();
+void parseExpression();
+void parseExpressionWithWhere();
 
-/**
- * The Parser class is responsible for parsing a sequence of tokens and constructing the Abstract Syntax Tree (AST).
- */
+void parseTerm();
+void parseTermWithAugmentation();
+void parseTermWithCondition();
+
+void parseBooleanExpression();
+void parseBooleanTerm();
+void parseBooleanFactor();
+void parseBooleanPredicate();
+
+void parseArithmeticExpression();
+void parseArithmeticTerm();
+void parseArithmeticFactor();
+void parseArithmeticPower();
+
+void parseAtomicExpression();
+void parseAtomicPrimary();
+
+void parseDeclaration();
+void parseDeclarationWithWithinClause();
+void parseRecursiveDeclaration();
+void parseDeclarationBody();
+
+void parseVariableBinding();
+void parseVariableList();
+
+// Constructing an AST from token sequences.
 class Parser
 {
 public:
     static std::vector<TreeNode *> nodeStack;
-
-    /**
-     * Parses the input tokens and constructs the Abstract Syntax Tree (AST).
-     */
     static void parse()
     {
         TokenStorage &tokenStorage = TokenStorage::getInstance();
@@ -55,7 +53,7 @@ public:
         }
         else
         {
-            E(); // Start parsing the expression
+            parseExpression(); // Start parsing the expression
 
             // Check if the next token is the end of file token
             if (tokenStorage.top().type == token_type::END_OF_FILE)
@@ -117,7 +115,7 @@ void build_tree(const std::string &label, const int &num, const bool isLeaf, con
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void E()
+void parseExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
@@ -125,13 +123,13 @@ void E()
     if (tokenStorage.top().value == "let")
     {
         tokenStorage.pop();
-        D();
+        parseDeclaration();
 
         // Check if the next token is "in"
         if (tokenStorage.top().value == "in")
         {
             tokenStorage.pop();
-            E();
+            parseExpression();
         }
         else
         {
@@ -150,7 +148,7 @@ void E()
         // Process identifiers until a non-identifier token is encountered
         while (tokenStorage.top().type == token_type::IDENTIFIER)
         {
-            Vb();
+            parseVariableBinding();
             n++;
         }
 
@@ -163,7 +161,7 @@ void E()
         if (tokenStorage.top().value == ".")
         {
             tokenStorage.pop();
-            E();
+            parseExpression();
         }
         else
         {
@@ -175,7 +173,7 @@ void E()
     }
     else
     {
-        Ew();
+        parseExpressionWithWhere();
     }
 }
 
@@ -186,16 +184,16 @@ void E()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Ew()
+void parseExpressionWithWhere()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    T();
+    parseTerm();
 
     // Check if the next token is "where"
     if (tokenStorage.top().value == "where")
     {
         tokenStorage.pop();
-        Dr();
+        parseRecursiveDeclaration();
         build_tree("where", 2, false);
     }
 }
@@ -207,17 +205,17 @@ void Ew()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void T()
+void parseTerm()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Ta();
+    parseTermWithAugmentation();
     int n = 0;
 
     // Process additional T expressions separated by commas
     while (tokenStorage.top().value == ",")
     {
         tokenStorage.pop();
-        Ta();
+        parseTermWithAugmentation();
         n++;
     }
 
@@ -234,16 +232,16 @@ void T()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Ta()
+void parseTermWithAugmentation()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Tc();
+    parseTermWithCondition();
 
     // Process additional Tc expressions separated by "aug" keyword
     while (tokenStorage.top().value == "aug")
     {
         tokenStorage.pop();
-        Tc();
+        parseTermWithCondition();
         build_tree("aug", 2, false);
     }
 }
@@ -255,22 +253,22 @@ void Ta()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Tc()
+void parseTermWithCondition()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    B();
+    parseBooleanExpression();
 
     // Check if the next token is "->"
     if (tokenStorage.top().value == "->")
     {
         tokenStorage.pop();
-        Tc();
+        parseTermWithCondition();
 
         // Check if the next token is "|"
         if (tokenStorage.top().value == "|")
         {
             tokenStorage.pop();
-            Tc();
+            parseTermWithCondition();
             build_tree("->", 3, false);
         }
         else
@@ -287,16 +285,16 @@ void Tc()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void B()
+void parseBooleanExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Bt();
+    parseBooleanTerm();
 
     // Process additional Bt expressions separated by "or" keyword
     while (tokenStorage.top().value == "or")
     {
         tokenStorage.pop();
-        Bt();
+        parseBooleanTerm();
         build_tree("or", 2, false);
     }
 }
@@ -308,16 +306,16 @@ void B()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Bt()
+void parseBooleanTerm()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Bs();
+    parseBooleanFactor();
 
     // Process additional Bs expressions separated by "&" keyword
     while (tokenStorage.top().value == "&")
     {
         tokenStorage.pop();
-        Bs();
+        parseBooleanFactor();
         build_tree("&", 2, false);
     }
 }
@@ -329,18 +327,18 @@ void Bt()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Bs()
+void parseBooleanFactor()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
     if (tokenStorage.top().value == "not")
     {
         tokenStorage.pop();
-        Bp();
+        parseBooleanPredicate();
         build_tree("not", 1, false);
     }
     else
     {
-        Bp();
+        parseBooleanPredicate();
     }
 }
 
@@ -351,46 +349,46 @@ void Bs()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Bp()
+void parseBooleanPredicate()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    A();
+    parseArithmeticExpression();
 
     // Check for comparison operators
     if (tokenStorage.top().value == "gr" || tokenStorage.top().value == ">")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("gr", 2, false);
     }
     else if (tokenStorage.top().value == "ge" || tokenStorage.top().value == ">=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("ge", 2, false);
     }
     else if (tokenStorage.top().value == "ls" || tokenStorage.top().value == "<")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("ls", 2, false);
     }
     else if (tokenStorage.top().value == "le" || tokenStorage.top().value == "<=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("le", 2, false);
     }
     else if (tokenStorage.top().value == "eq" || tokenStorage.top().value == "=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("eq", 2, false);
     }
     else if (tokenStorage.top().value == "ne" || tokenStorage.top().value == "!=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("ne", 2, false);
     }
 }
@@ -402,7 +400,7 @@ void Bp()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void A()
+void parseArithmeticExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
@@ -410,18 +408,18 @@ void A()
     if (tokenStorage.top().value == "+")
     {
         tokenStorage.pop();
-        At();
+        parseArithmeticTerm();
     }
     // Check for unary minus operator
     else if (tokenStorage.top().value == "-")
     {
         tokenStorage.pop();
-        At();
+        parseArithmeticTerm();
         build_tree("neg", 1, false);
     }
     else
     {
-        At();
+        parseArithmeticTerm();
     }
 
     // Check for addition and subtraction operators
@@ -430,13 +428,13 @@ void A()
         if (tokenStorage.top().value == "+")
         {
             tokenStorage.pop();
-            At();
+            parseArithmeticTerm();
             build_tree("+", 2, false);
         }
         else if (tokenStorage.top().value == "-")
         {
             tokenStorage.pop();
-            At();
+            parseArithmeticTerm();
             build_tree("-", 2, false);
         }
     }
@@ -449,10 +447,10 @@ void A()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void At()
+void parseArithmeticTerm()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Af();
+    parseArithmeticFactor();
 
     // Check for multiplication and division operators
     while (tokenStorage.top().value == "*" || tokenStorage.top().value == "/")
@@ -460,13 +458,13 @@ void At()
         if (tokenStorage.top().value == "*")
         {
             tokenStorage.pop();
-            Af();
+            parseArithmeticFactor();
             build_tree("*", 2, false);
         }
         else if (tokenStorage.top().value == "/")
         {
             tokenStorage.pop();
-            Af();
+            parseArithmeticFactor();
             build_tree("/", 2, false);
         }
     }
@@ -479,16 +477,16 @@ void At()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Af()
+void parseArithmeticFactor()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Ap();
+    parseArithmeticPower();
 
     // Check for exponentiation operator
     while (tokenStorage.top().value == "**")
     {
         tokenStorage.pop();
-        Ap();
+        parseArithmeticPower();
         build_tree("**", 2, false);
     }
 }
@@ -500,10 +498,10 @@ void Af()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Ap()
+void parseArithmeticPower()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    R();
+    parseAtomicExpression();
 
     // Check for function application operator
     while (tokenStorage.top().value == "@")
@@ -521,7 +519,7 @@ void Ap()
             throw std::runtime_error("Syntax Error: Identifier expected");
         }
 
-        R();
+        parseAtomicExpression();
         build_tree("@", 3, false);
     }
 }
@@ -533,15 +531,15 @@ void Ap()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void R()
+void parseAtomicExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Rn();
+    parseAtomicPrimary();
 
     Token top = tokenStorage.top();
     while (top.type == token_type::IDENTIFIER || top.type == token_type::INTEGER || top.type == token_type::STRING || top.value == "true" || top.value == "false" || top.value == "nil" || top.value == "(" || top.value == "dummy")
     {
-        Rn();
+        parseAtomicPrimary();
         top = tokenStorage.top();
         build_tree("gamma", 2, false);
     }
@@ -554,7 +552,7 @@ void R()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Rn()
+void parseAtomicPrimary()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
     Token top = tokenStorage.top();
@@ -598,7 +596,7 @@ void Rn()
     else if (top.value == "(")
     {
         tokenStorage.pop();
-        E();
+        parseExpression();
         if (tokenStorage.top().value == ")")
         {
             tokenStorage.pop();
@@ -627,15 +625,15 @@ void Rn()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void D()
+void parseDeclaration()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Da();
+    parseDeclarationWithWithinClause();
 
     while (tokenStorage.top().value == "within")
     {
         tokenStorage.pop();
-        D();
+        parseDeclaration();
         build_tree("within", 2, false);
     }
 }
@@ -647,16 +645,16 @@ void D()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Da()
+void parseDeclarationWithWithinClause()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Dr();
+    parseRecursiveDeclaration();
     int n = 0;
 
     while (tokenStorage.top().value == "and")
     {
         tokenStorage.pop();
-        Dr();
+        parseRecursiveDeclaration();
         n++;
     }
     if (n > 0) {
@@ -671,19 +669,19 @@ void Da()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Dr()
+void parseRecursiveDeclaration()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
     if (tokenStorage.top().value == "rec")
     {
         tokenStorage.pop();
-        Db();
+        parseDeclarationBody();
         build_tree("rec", 1, false);
     }
     else
     {
-        Db();
+        parseDeclarationBody();
     }
 }
 
@@ -694,14 +692,14 @@ void Dr()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Db()
+void parseDeclarationBody()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
     if (tokenStorage.top().value == "(")
     {
         tokenStorage.pop();
-        D();
+        parseDeclaration();
 
         if (tokenStorage.top().value == ")")
         {
@@ -721,12 +719,12 @@ void Db()
         if (tokenStorage.top().value == ",")
         {
             tokenStorage.pop();
-            Vl();
+            parseVariableList();
 
             if (tokenStorage.top().value == "=")
             {
                 tokenStorage.pop();
-                E();
+                parseExpression();
                 build_tree("=", 2, false);
             }
             else
@@ -740,7 +738,7 @@ void Db()
 
             while (tokenStorage.top().value != "=" && tokenStorage.top().type == token_type::IDENTIFIER)
             {
-                Vb();
+                parseVariableBinding();
                 n++;
             }
 
@@ -749,7 +747,7 @@ void Db()
                 //                tokenStorage.pop();
                 //                while (tokenStorage.top().value != ")")
                 //                {
-                //                    Vb();
+                //                    parseVariableBinding();
                 //                    if (tokenStorage.top().value == ",")
                 //                    {
                 //                        tokenStorage.pop();
@@ -768,20 +766,20 @@ void Db()
                 //                else {
                 //                    throw std::runtime_error("Syntax Error: ')' expected");
                 //                }
-                Vb();
+                parseVariableBinding();
                 n++;
             }
 
             if (n == 0 && tokenStorage.top().value == "=")
             {
                 tokenStorage.pop();
-                E();
+                parseExpression();
                 build_tree("=", 2, false);
             }
             else if (n != 0 && tokenStorage.top().value == "=")
             {
                 tokenStorage.pop();
-                E();
+                parseExpression();
                 build_tree("fcn_form", n + 2, false);
             }
             else
@@ -803,7 +801,7 @@ void Db()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Vb()
+void parseVariableBinding()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
@@ -831,7 +829,7 @@ void Vb()
             if (tokenStorage.top().value == ",")
             {
                 tokenStorage.pop();
-                Vl();
+                parseVariableList();
             }
             //            else
             //            {
@@ -865,7 +863,7 @@ void Vb()
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Vl()
+void parseVariableList()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
@@ -892,4 +890,4 @@ void Vl()
     }
 }
 
-#endif // RPAL_CLION_PARSER_H
+#endif
