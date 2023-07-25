@@ -33,15 +33,15 @@ void Vb();
 void Vl();
 
 /**
- * The Parser class is responsible for parsing a sequence of tokens and constructing the Abstract Syntax Tree (AST).
+ * The Parser class is responsible for parsing a sequence of tokens and constructing the Abstract Syntax CustomTree (AST).
  */
 class Parser
 {
 public:
-    static std::vector<TreeNode *> nodeStack;
+    static std::vector<CustomTreeNode *> nodeStack;
 
     /**
-     * Parses the input tokens and constructs the Abstract Syntax Tree (AST).
+     * Parses the input tokens and constructs the Abstract Syntax CustomTree (AST).
      */
     static void parse()
     {
@@ -61,7 +61,7 @@ public:
             if (tokenStorage.top().type == token_type::END_OF_FILE)
             {
                 // Set the root of the AST to the last node in the nodeStack
-                Tree::getInstance().setASTRoot(Parser::nodeStack.back());
+                CustomTree::getInstance().setASTRoot(Parser::nodeStack.back());
                 return; // Parsing completed, return from the function
             }
             else
@@ -72,10 +72,10 @@ public:
     }
 };
 
-std::vector<TreeNode *> Parser::nodeStack;
+std::vector<CustomTreeNode *> Parser::nodeStack;
 
 /**
- * Constructs a new TreeNode with the specified nodeLabel, number of children, leaf status, and nodeValue.
+ * Constructs a new CustomTreeNode with the specified nodeLabel, number of children, leaf status, and nodeValue.
  * Adds the constructed node to the nodeStack.
  * @param nodeLabel The nodeLabel of the node.
  * @param num The number of children the node will have.
@@ -84,7 +84,7 @@ std::vector<TreeNode *> Parser::nodeStack;
  */
 void build_tree(const std::string &nodeLabel, const int &num, const bool isLeaf, const std::string &nodeValue = "")
 {
-    TreeNode *node;
+    CustomTreeNode *node;
 
     // Create a leaf node if isLeaf is true, otherwise create an internal node
     if (isLeaf)
@@ -99,12 +99,12 @@ void build_tree(const std::string &nodeLabel, const int &num, const bool isLeaf,
     // Add the children from the nodeStack to the newly created node
     for (int i = 0; i < num; i++)
     {
-        node->addChild(Parser::nodeStack.back());
+        node->appendChild(Parser::nodeStack.back());
         Parser::nodeStack.pop_back();
     }
 
     // Reverse the order of the children
-    node->reverseChildren();
+    node->reverseChildrenOrder();
 
     // Push the constructed node onto the nodeStack
     Parser::nodeStack.push_back(node);
@@ -113,7 +113,7 @@ void build_tree(const std::string &nodeLabel, const int &num, const bool isLeaf,
 /**
  * Parses the expression starting with E.
  * Handles the grammar rule E -> "let" D "in" E | "fn" Vb { Vb } "." E | Ew.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -182,7 +182,7 @@ void E()
 /**
  * Parses the expression starting with Ew.
  * Handles the grammar rule Ew -> T [ "where" Dr ].
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -203,7 +203,7 @@ void Ew()
 /**
  * Parses the expression starting with T.
  * Handles the grammar rule T -> Ta { "," Ta }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -230,7 +230,7 @@ void T()
 /**
  * Parses the expression starting with Ta.
  * Handles the grammar rule Ta -> Tc { "aug" Tc }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -251,7 +251,7 @@ void Ta()
 /**
  * Parses the expression starting with Tc.
  * Handles the grammar rule Tc -> B [ "->" Tc [ "|" Tc ] ].
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -283,7 +283,7 @@ void Tc()
 /**
  * Parses the expression starting with B.
  * Handles the grammar rule B -> Bt { "or" Bt }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -304,7 +304,7 @@ void B()
 /**
  * Parses the expression starting with Bt.
  * Handles the grammar rule Bt -> Bs { "&" Bs }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -325,7 +325,7 @@ void Bt()
 /**
  * Parses the expression starting with Bs.
  * Handles the grammar rule Bs -> "not" Bp | Bp.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -347,7 +347,7 @@ void Bs()
 /**
  * Parses the expression starting with Bp.
  * Handles the grammar rule Bp -> A { comparison_operator A }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -398,7 +398,7 @@ void Bp()
 /**
  * Parses the expression starting with A.
  * Handles the grammar rule A -> + At | - At | At { + At | - At }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -445,7 +445,7 @@ void A()
 /**
  * Parses the expression starting with At.
  * Handles the grammar rule At -> Af { * Af | / Af }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -475,7 +475,7 @@ void At()
 /**
  * Parses the expression starting with Af.
  * Handles the grammar rule Af -> Ap { ** Ap }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -496,7 +496,7 @@ void Af()
 /**
  * Parses the expression starting with Ap.
  * Handles the grammar rule Ap -> R { @ identifier R }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -529,7 +529,7 @@ void Ap()
 /**
  * Parses the expression starting with R.
  * Handles the grammar rule R -> Rn { Rn }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -550,7 +550,7 @@ void R()
 /**
  * Parses the expression starting with Rn.
  * Handles the grammar rule Rn -> identifier | integer | string | true | false | nil | ( E ) | dummy.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -623,7 +623,7 @@ void Rn()
 /**
  * Parses the expression starting with D.
  * Handles the grammar rule D -> Da [ within D ].
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -643,7 +643,7 @@ void D()
 /**
  * Parses the expression starting with Da.
  * Handles the grammar rule Da -> Dr { and Dr }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -667,7 +667,7 @@ void Da()
 /**
  * Parses the expression starting with Dr.
  * Handles the grammar rule Dr -> rec Db | Db.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -690,7 +690,7 @@ void Dr()
 /**
  * Parses the expression starting with Db.
  * Handles the grammar rule Db -> ( D ) | identifier Vl = E | Vb { , Vb } = E | epsilon.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -799,7 +799,7 @@ void Db()
 /**
  * Parses the expression starting with Vb.
  * Handles the grammar rule Vb -> identifier | ( ) | ( identifier Vl ).
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
@@ -861,7 +861,7 @@ void Vb()
 /**
  * Parses the expression starting with Vl.
  * Handles the grammar rule Vl -> identifier { , identifier }.
- * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
+ * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */

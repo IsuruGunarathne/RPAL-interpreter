@@ -65,12 +65,12 @@ void printGraphvizWarning()
 /**
  * Helper function to generate the dot file contents recursively.
  *
- * @param node The current TreeNode being processed.
+ * @param node The current CustomTreeNode being processed.
  * @param file The ofstream object for writing the dot file.
  * @param parent The parent node ID (default: -1).
  * @return The ID of the current node.
  */
-int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, int nodeCount = 0)
+int generateDotFileHelper(CustomTreeNode *node, std::ofstream &file, int parent = -1, int nodeCount = 0)
 {
     int currentNode = nodeCount;
 
@@ -124,7 +124,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     }
 
     // Recursively generate dot file contents for each child node
-    for (TreeNode *child : node->getChildren())
+    for (CustomTreeNode *child : node->getChildren())
     {
         nextNodeCount = generateDotFileHelper(child, file, currentNode, nextNodeCount);
     }
@@ -137,15 +137,15 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
  *
  * @param root The root node of the AST.
  */
-void generateDotFile(TreeNode *root, std::string filename)
+void generateDotFile(CustomTreeNode *root, std::string filename)
 {
-    // std::ofstream file("Visualizations/tree.dot");
+    // std::ofstream file("Visualizations/customTree.dot");
      std::string f_name = std::string(R"(D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\)") + filename;
 //    std::string f_name = std::string("Visualizations\\") + filename;
     std::ofstream file(f_name);
     if (file.is_open())
     {
-        file << "digraph Tree {\n";
+        file << "digraph CustomTree {\n";
         generateDotFileHelper(root, file, 0);
         file << "}\n";
         file.close();
@@ -220,17 +220,17 @@ int main(int argc, char *argv[])
     Parser::parse();
     TokenStorage::destroyInstance();
 
-    TreeNode *root = Tree::getInstance().getASTRoot();
+    CustomTreeNode *root = CustomTree::getInstance().getASTRoot();
 
     if (visualizeAst)
     {
         // Generate the DOT file
         generateDotFile(root, "ast.dot");
 
-        // Tree::releaseASTMemory();
+        // CustomTree::releaseASTMemory();
 
         // // Use Graphviz to generate the graph
-        // system("dot -Tpng Visualizations\\tree.dot -o Visualizations\\tree.png");
+        // system("dot -Tpng Visualizations\\customTree.dot -o Visualizations\\customTree.png");
 
          std::string dotFilePath = R"("D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\ast.dot")";
          std::string outputFilePath = R"("D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\ast.png")";
@@ -241,12 +241,12 @@ int main(int argc, char *argv[])
         std::string command = "dot -Tpng -Gdpi=150 " + dotFilePath + " -o " + outputFilePath;
         system(command.c_str());
 
-        // tree.png folder path message
+        // customTree.png folder path message
         std::cout << "The ast.png file is located in the Visualizations folder." << std::endl;
     }
 
-    Tree::generate();
-    TreeNode *st_root = Tree::getInstance().getSTRoot();
+    CustomTree::generate();
+    CustomTreeNode *st_root = CustomTree::getInstance().getSTRoot();
 
     if (visualizeSt)
     {
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
     }
 
     CSE cse = CSE();
-    cse.create_cs(Tree::getInstance().getSTRoot());
+    cse.create_cs(CustomTree::getInstance().getSTRoot());
     cse.evaluate();
 
     std::cout << std::endl;
