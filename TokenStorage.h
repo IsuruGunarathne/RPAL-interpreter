@@ -5,30 +5,29 @@
 #include <vector>
 
 /**
- * 
- * The TokenStorage class is responsible for storing and managing tokens during parsing.
- * It implements the singleton pattern to ensure only one instance exists throughout the program.
+ * Tokens are stored and managed during parsing by the TokenStorage class.
+ * The existance of only one instance in the entire program is ensured by using the singleton pattern.
  */
 class TokenStorage
 {
 private:
-    static TokenStorage instance; // Singleton instance
-    std::vector<Token> tokens;    // Vector to store tokens
-    int currPosition;          // Current position in the tokens vector
-    Lexer *lexer;                 // Pointer to the lexer
+    static TokenStorage instance;       // Instance of Singleton pattern
+    std::vector<Token> tokens;          // A vector which store tokens
+    int currPosition;                   // The current position in the tokens vector
+    Lexer *lexer;                       // Pointer to the lexer
 
-    // Private constructor to prevent instantiation
+    // Private constructor which avoids instantiation
     TokenStorage() {}
 
-    // Private destructor to prevent deletion of the instance
+    // Private destructor which avoids deletion of the instance
     ~TokenStorage() {}
 
-    // Private copy constructor and assignment operator to prevent copying
+    // Private copy constructor and assignment operator which prevent duplicating the instance
     TokenStorage(const TokenStorage &) = delete;
     TokenStorage &operator=(const TokenStorage &) = delete;
 
     /**
-     * Retrieves tokens from the lexer and stores them in the tokens vector until the end of file token is encountered.
+     * Tokens are retrieved from the lexer and stored in the tokens vector until the encounter of the token which represents end of file
      */
     void setTokens()
     {
@@ -89,7 +88,7 @@ public:
 
     /**
      * Clears the tokens vector and sets the lexer to nullptr.
-     * This method should be called when the TokenStorage instance is no longer needed.
+     * Called when the TokenStorage instance is no longer needed.
      */
     static void clearInstance()
     {
