@@ -76,7 +76,7 @@ public:
     /**
      * @brief Releases the memory occupied by the Abstract Syntax Tree (AST).
      *
-     * This function calls the static releaseNodeMemory() function
+     * This function calls the static deleteNodeMemory() function
      * of the CustomTreeNode class to release the memory of all AST nodes.
      * It should be called when the AST is no longer needed to avoid memory leaks.
      */
@@ -96,13 +96,13 @@ public:
     /**
      * @brief Releases the memory occupied by the Standardized Tree (ST).
      *
-     * This function calls the static releaseNodeMemory() function
+     * This function calls the static deleteNodeMemory() function
      * of the CustomTreeNode class to release the memory of all ST nodes.
      * It should be called when the ST is no longer needed to avoid memory leaks.
      */
     static void releaseSTMemory()
     {
-        CustomTreeNode::releaseNodeMemory(tree->stRoot);
+        CustomTreeNode::deleteNodeMemory(tree->stRoot);
     }
 
     /**

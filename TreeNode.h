@@ -1,8 +1,7 @@
-#ifndef TREENODE_H
-#define TREENODE_H
+#ifndef CUSTOM_TREE_NODE_H
+#define CUSTOM_TREE_NODE_H
 
 #include <string>
-#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -86,7 +85,7 @@ public:
 
         if (deleteNode)
         {
-            releaseNodeMemory(children[index]);
+            deleteNodeMemory(children[index]);
         }
 
         children.erase(children.begin() + index);
@@ -113,14 +112,14 @@ public:
      * @brief Releases the memory occupied by a CustomTreeNode and its child nodes.
      * @param node The node to release memory for.
      */
-    static void releaseNodeMemory(CustomTreeNode *node)
+    static void deleteNodeMemory(CustomTreeNode *node)
     {
         if (node == nullptr)
             return;
 
         for (CustomTreeNode *child : node->getChildren())
         {
-            releaseNodeMemory(child);
+            deleteNodeMemory(child);
         }
 
         delete node;
@@ -128,11 +127,7 @@ public:
 };
 
 /**
- * @brief Represents an internal node in a tree structure.
- *
- * The InternalNode class is a specialization of the CustomTreeNode class
- * that represents an internal node in a tree. It has a nodeLabel and an
- * optional nodeValue associated with it.
+ * @brief Represents an internal node in a custom tree structure.
  */
 class InternalNode : public CustomTreeNode
 {
@@ -140,7 +135,7 @@ public:
     /**
      * @brief Constructs an InternalNode object with the specified nodeLabel and nodeValue.
      * @param l The nodeLabel of the internal node.
-     * @param v The nodeValue associated with the internal node (default: "").
+     * @param v The nodeValue associated with the internal node.
      */
     InternalNode(const std::string &l, const std::string &v = " ") : CustomTreeNode(l)
     {
@@ -149,11 +144,7 @@ public:
 };
 
 /**
- * @brief Represents a leaf node in a tree structure.
- *
- * The LeafNode class is a specialization of the CustomTreeNode class that
- * represents a leaf node in a tree. It has a nodeLabel and a nodeValue associated
- * with it.
+ * @brief Represents a leaf node in a custom tree structure.
  */
 class LeafNode : public CustomTreeNode
 {
@@ -171,4 +162,4 @@ public:
     void appendChild(CustomTreeNode *child) = delete;
 };
 
-#endif // TREENODE_H
+#endif // CUSTOM_TREE_NODE_H
