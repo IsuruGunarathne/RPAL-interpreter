@@ -6,95 +6,95 @@
 void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode);
 
 /**
- * @brief Represents the Tree for a program.
+ * @brief Represents the Custom Tree for a program.
  *
- * The Tree class stores the root nodes of the AST and ST and provides
+ * The CustomTree class stores the root nodes of the AST and ST and provides
  * access to them. It follows the Singleton design pattern to ensure
- * that only one instance of the Tree exists.
+ * that only one instance of the CustomTree exists.
  */
-class Tree
+class CustomTree
 {
 private:
-    static Tree *tree;           // The singleton instance of the Tree
-    CustomTreeNode *astRoot = nullptr; // The root node of the Abstract Syntax Tree (AST)
-    CustomTreeNode *stRoot = nullptr;  // The root node of the Standardized Tree (ST)
+    static CustomTree *customTree; // The singleton instance of the CustomTree          // The singleton instance of the CustomTree
+    CustomTreeNode *astRoot = nullptr; // The root node of the Abstract Syntax CustomTree (AST)
+    CustomTreeNode *stRoot = nullptr;  // The root node of the Standardized CustomTree (ST)
 
-    Tree() {} // Private constructor
+    CustomTree() {} // Private constructor
 
-    ~Tree() {} // Private destructor
+    ~CustomTree() {} // Private destructor
 
-    Tree(const Tree &) = delete; // Disable copy constructor
+    CustomTree(const CustomTree &) = delete; // Disable copy constructor
 
-    Tree &operator=(const Tree &) = delete; // Disable assignment operator
+    CustomTree &operator=(const CustomTree &) = delete; // Disable assignment operator
 
 public:
     /**
-     * @brief Returns the singleton instance of the Tree.
-     * @return The reference to the Tree instance.
-     */
-    static Tree &getInstance()
-    {
-        return *tree;
-    }
-
-    /**
      * @brief Sets the root node of the Abstract Syntax Tree (AST).
-     * @param r The root node to set.
+     * @param root The root node to set.
      */
-    void setASTRoot(CustomTreeNode *r)
+    static CustomTree &getInstance()
     {
-        astRoot = r;
+        return *customTree;
     }
 
     /**
-     * @brief Retrieves the root node of the Abstract Syntax Tree (AST).
+     * @brief Sets the root node of the Abstract Syntax CustomTree (AST).
+     * @param root The root node to set.
+     */
+    void setASTRoot(CustomTreeNode *root)
+    {
+        astRoot = root;
+    }
+
+    /**
+     * @brief Retrieves the root node of the Abstract Syntax CustomTree (AST).
      * @return The root node of the AST.
      */
     CustomTreeNode *getASTRoot()
     {
         return astRoot;
     }
-
-    /**
-     * @brief Sets the root node of the Standardized Tree (ST).
-     * @param r The root node to set.
-     */
-    void setSTRoot(CustomTreeNode *r)
-    {
-        stRoot = r;
-    }
-
-    /**
-     * @brief Retrieves the root node of the Standardized Tree (ST).
+        /**
+     * @brief Retrieves the root node of the Standardized CustomTree (ST).
      * @return The root node of the ST.
      */
     CustomTreeNode *getSTRoot()
     {
         return stRoot;
     }
+    /**
+     * @brief Sets the root node of the Standardized CustomTree (ST).
+     * @param root The root node to set.
+     */
+    void setSTRoot(CustomTreeNode *root)
+    {
+        stRoot = root;
+    }
+
+
 
     /**
-     * @brief Releases the memory occupied by the Abstract Syntax Tree (AST).
+     * @brief Releases the memory occupied by the Abstract Syntax CustomTree (AST).
      *
-     * This function calls the static deleteNodeMemory() function
-     * of the CustomTreeNode class to release the memory of all AST nodes.
-     * It should be called when the AST is no longer needed to avoid memory leaks.
+     * This function sets the AST root node to nullptr to release the memory
+     * occupied by the AST. It should be called when the AST is no longer needed
+     * to avoid memory leaks.
      */
     static void releaseASTMemory()
     {
-        if (tree->astRoot != nullptr)
+        if (customTree->astRoot != nullptr)
         {
-            if (tree->stRoot == nullptr)
+            if (customTree->stRoot == nullptr)
             {
-                tree->stRoot = tree->astRoot;
+                customTree->stRoot = customTree->astRoot;
             }
 
-            tree->astRoot = nullptr;
+            customTree->astRoot = nullptr;
         }
     }
 
     /**
-     * @brief Releases the memory occupied by the Standardized Tree (ST).
+     * @brief Releases the memory occupied by the Standardized CustomTree (ST).
      *
      * This function calls the static deleteNodeMemory() function
      * of the CustomTreeNode class to release the memory of all ST nodes.
@@ -102,11 +102,11 @@ public:
      */
     static void releaseSTMemory()
     {
-        CustomTreeNode::deleteNodeMemory(tree->stRoot);
+        CustomTreeNode::deleteNodeMemory(customTree->stRoot);
     }
 
     /**
-     * @brief Generates the Standardized Tree (ST) from the Abstract Syntax Tree (AST).
+     * @brief Generates the Standardized CustomTree (ST) from the Abstract Syntax CustomTree (AST).
      *
      * This function calls the generateST() function to generate the ST from the AST.
      * It should be called when the AST is no longer needed to avoid memory leaks.
@@ -114,17 +114,14 @@ public:
     static void generate()
     {
         releaseASTMemory();
-        generateST(tree->stRoot, nullptr);
+        generateST(customTree->stRoot, nullptr);
     }
 };
 
-Tree *Tree::tree = new Tree(); // Initialize the singleton instance of the Tree
+CustomTree *CustomTree::customTree = new CustomTree(); // Initialize the singleton instance of the CustomTree
 
 /**
- * Generates the Syntax Tree (ST) by modifying the given tree structure.
- *
- * @param currentNode The current node being processed.
- * @param parentNode The parent node of the current node.
+ * Generates the Syntax CustomTree (ST) by modifying the given customTree structure.
  */
 void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
 {
@@ -138,12 +135,12 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
         std::vector<CustomTreeNode *> children = currentNode->getChildren(); // Get the children of the current node
         for (CustomTreeNode *child : children)
         {
-            generateST(child, currentNode); // Recursively generate the syntax tree for each child
+            generateST(child, currentNode); // Recursively generate the syntax customTree for each child
             currentNode->removeChild(0);    // Remove the processed child from the current node
         }
     }
 
-    CustomTreeNode *root_node; // Assign the current node as the root node of the syntax tree
+    CustomTreeNode *root_node; // Assign the current node as the root node of the syntax customTree
 
     // Define a static vector of binary operators
     static std::vector<std::string> binaryOperators = {
@@ -357,7 +354,7 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
             CustomTreeNode *first_eq_node = children[0];
             CustomTreeNode *second_eq_node = children[1];
 
-            // Create new nodes for constructing the modified syntax tree
+            // Create new nodes for constructing the modified syntax customTree
             CustomTreeNode *new_eq_node = new InternalNode("=");
             CustomTreeNode *new_gamma_node = new InternalNode("gamma");
             CustomTreeNode *new_lambda_node = new InternalNode("lambda");
@@ -494,8 +491,8 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
     }
     if (parentNode == nullptr)
     {
-        // If the parentNode is null, set the root_node as the new syntax tree root
-        Tree::getInstance().setSTRoot(root_node);
+        // If the parentNode is null, set the root_node as the new syntax customTree root
+        CustomTree::getInstance().setSTRoot(root_node);
         return; // Exit the function
     }
     else

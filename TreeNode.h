@@ -6,9 +6,9 @@
 #include <algorithm>
 
 /**
- * @brief Represents a custom tree node.
+ * @brief Represents a custom customTree node.
  *
- * The CustomTreeNode class represents a node in a custom tree structure.
+ * The CustomTreeNode class represents a node in a custom customTree structure.
  * It contains a label, a vector of child nodes, and an optional value.
  * It provides methods to add children, reverse the order of children, and
  * retrieve information about the node.
@@ -127,7 +127,7 @@ public:
 };
 
 /**
- * @brief Represents an internal node in a custom tree structure.
+ * @brief Represents an internal node in a custom customTree structure.
  */
 class InternalNode : public CustomTreeNode
 {
@@ -144,7 +144,7 @@ public:
 };
 
 /**
- * @brief Represents a leaf node in a custom tree structure.
+ * @brief Represents a leaf node in a custom customTree structure.
  */
 class LeafNode : public CustomTreeNode
 {
