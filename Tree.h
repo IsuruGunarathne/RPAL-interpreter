@@ -296,50 +296,9 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
     }
     else if (currentNode->getLabel() == "tau")
     {
-        // if (currentNode->getChildCount() >= 2)
-        // {
-        //     CustomTreeNode *head_first_gamma_node = new InternalNode("gamma");
-        //     CustomTreeNode *head_second_gamma_node = new InternalNode("gamma");
-        //     head_first_gamma_node->appendChild(head_second_gamma_node);
-
-        //     CustomTreeNode *aug_node = new LeafNode("identifier", "aug");
-        //     head_second_gamma_node->appendChild(aug_node);
-
-        //     std::vector<CustomTreeNode *> children = currentNode->getChildren();
-        //     // reverse the children vector
-        //     std::reverse(children.begin(), children.end());
-
-        //     CustomTreeNode *prev_first_node = head_first_gamma_node;
-        //     CustomTreeNode *prev_second_node = head_second_gamma_node;
-        //     for (CustomTreeNode *child : children)
-        //     {
-        //         prev_first_node->appendChild(child);
-
-        //         CustomTreeNode *new_first_gamma_node = new InternalNode("gamma");
-        //         CustomTreeNode *new_second_gamma_node = new InternalNode("gamma");
-        //         new_first_gamma_node->appendChild(new_second_gamma_node);
-
-        //         CustomTreeNode *new_aug_node = new LeafNode("identifier", "aug");
-        //         new_second_gamma_node->appendChild(new_aug_node);
-
-        //         prev_second_node->appendChild(new_first_gamma_node);
-
-        //         prev_first_node = new_first_gamma_node;
-        //         prev_second_node = new_second_gamma_node;
-        //     }
-
-        //     CustomTreeNode *nil_node = new LeafNode("identifier", "nil");
-        //     prev_second_node->appendChild(nil_node);
-
-        //     parentNode->appendChild(head_first_gamma_node);
-        // }
-        // else
-        // {
-        //     std::runtime_error("Error: tau node must have at least 2 children.");
-        // }
-
+       
         root_node = currentNode;
-        //        parentNode->appendChild(currentNode);
+     
     }
     else if (currentNode->getLabel() == "lambda" && currentNode->getChildren()[0]->getLabel() != "," &&
              currentNode->getChildren()[1]->getLabel() != ",")
@@ -425,39 +384,12 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
     }
     else if (currentNode->getLabel() == "not" || currentNode->getLabel() == "neg")
     {
-        // CustomTreeNode *new_gamma_node = new InternalNode("gamma");
-        // CustomTreeNode *new_uop_node = new LeafNode("identifier", currentNode->getLabel());
-
-        // new_gamma_node->appendChild(new_uop_node);
-        // new_gamma_node->appendChild(currentNode->getChildren()[0]);
-
-        // parentNode->appendChild(new_gamma_node);
-
         root_node = currentNode;
         //        parentNode->appendChild(currentNode);
     }
     else if (std::find(binaryOperators.begin(), binaryOperators.end(), currentNode->getLabel()) !=
              binaryOperators.end())
     {
-        // if (currentNode->getChildCount() == 2)
-        // {
-        //     std::vector<CustomTreeNode *> children = currentNode->getChildren();
-
-        //     CustomTreeNode *first_gamma_node = new InternalNode("gamma");
-        //     CustomTreeNode *second_gamma_node = new InternalNode("gamma");
-
-        //     first_gamma_node->appendChild(second_gamma_node);
-        //     first_gamma_node->appendChild(children[1]);
-
-        //     CustomTreeNode *new_binop_node = new LeafNode("identifier", currentNode->getLabel());
-
-        //     second_gamma_node->appendChild(new_binop_node);
-        //     second_gamma_node->appendChild(children[0]);
-
-        //     parentNode->appendChild(first_gamma_node);
-        // } else {
-        //     std::runtime_error("Error: binary operator node must have 2 children.");
-        // }
 
         root_node = currentNode;
         //        parentNode->appendChild(currentNode);
