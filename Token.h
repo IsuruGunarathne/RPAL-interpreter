@@ -23,7 +23,7 @@ enum token_type
 struct Token
 {
     token_type type;   // The type of the token
-    std::string value; // The value of the token
+    std::string nodeValue; // The nodeValue of the token
 };
 
 #endif // TOKEN_H

@@ -82,7 +82,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     std::string valueColor = "darkgreen";
     std::string fillColor = (node->getValue() == " " || node->getValue().empty()) ? "#CCCCCC" : "#FFFFFF";
 
-    // Escape label characters if necessary
+    // Escape nodeLabel characters if necessary
     std::string escapedLabel = node->getLabel();
 
     size_t pos1 = escapedLabel.find('&');
@@ -99,7 +99,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
         pos = escapedLabel.find('>', pos + 4);
     }
 
-    // Prepare label and value strings for the dot file
+    // Prepare nodeLabel and value strings for the dot file
     std::string labelStr = (escapedLabel.empty()) ? "&nbsp;" : escapedLabel;
     std::string valueStr = (node->getValue().empty()) ? "&nbsp;" : node->getValue();
 
@@ -112,7 +112,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     }
 
     // Write the node details to the dot file
-    file << "    node" << currentNode << " [label=<";
+    file << "    node" << currentNode << " [nodeLabel=<";
     file << "<font color=\"" << labelColor << "\">" << labelStr << "</font><br/>";
     file << "<font color=\"" << valueColor << "\">" << valueStr << "</font>";
     file << ">, style=filled, fillcolor=\"" << fillColor << "\"];\n";

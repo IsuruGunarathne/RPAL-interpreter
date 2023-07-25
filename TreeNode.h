@@ -9,24 +9,24 @@
 /**
  * @brief Represents a node in a tree structure.
  *
- * The TreeNode class represents a node in a tree. It contains a label,
- * a vector of child nodes, and an optional value. It provides methods
+ * The TreeNode class represents a node in a tree. It contains a nodeLabel,
+ * a vector of child nodes, and an optional nodeValue. It provides methods
  * to add children, reverse the order of children, and retrieve information
  * about the node.
  */
 class TreeNode
 {
 private:
-    std::string label;                // The label of the node
+    std::string nodeLabel;                // The nodeLabel of the node
     std::vector<TreeNode *> children; // The child nodes of the current node
-    std::string value;                // The value associated with the node
+    std::string nodeValue;                // The nodeValue associated with the node
 
 public:
     /**
-     * @brief Constructs a TreeNode object with the specified label.
-     * @param l The label of the node.
+     * @brief Constructs a TreeNode object with the specified nodeLabel.
+     * @param l The nodeLabel of the node.
      */
-    explicit TreeNode(std::string l) : label(std::move(l))
+    explicit TreeNode(std::string l) : nodeLabel(std::move(l))
     {
         children = std::vector<TreeNode *>();
     }
@@ -78,12 +78,12 @@ public:
     }
 
     /**
-     * @brief Returns the label of the node.
-     * @return The label of the node as a string.
+     * @brief Returns the nodeLabel of the node.
+     * @return The nodeLabel of the node as a string.
      */
     std::string getLabel()
     {
-        return label;
+        return nodeLabel;
     }
 
     /**
@@ -96,21 +96,21 @@ public:
     }
 
     /**
-     * @brief Returns the value associated with the node.
-     * @return The value of the node as a string.
+     * @brief Returns the nodeValue associated with the node.
+     * @return The nodeValue of the node as a string.
      */
     virtual std::string getValue()
     {
-        return value;
+        return nodeValue;
     }
 
     /**
-     * @brief Sets the value associated with the node.
-     * @param v The value to set.
+     * @brief Sets the nodeValue associated with the node.
+     * @param v The nodeValue to set.
      */
     void setValue(std::string v)
     {
-        value = std::move(v);
+        nodeValue = std::move(v);
     }
 
     /**
@@ -135,16 +135,16 @@ public:
  * @brief Represents an internal node in a tree structure.
  *
  * The InternalNode class is a specialization of the TreeNode class
- * that represents an internal node in a tree. It has a label and an
- * optional value associated with it.
+ * that represents an internal node in a tree. It has a nodeLabel and an
+ * optional nodeValue associated with it.
  */
 class InternalNode : public TreeNode
 {
 public:
     /**
-     * @brief Constructs an InternalNode object with the specified label and value.
-     * @param l The label of the internal node.
-     * @param v The value associated with the internal node (default: "").
+     * @brief Constructs an InternalNode object with the specified nodeLabel and nodeValue.
+     * @param l The nodeLabel of the internal node.
+     * @param v The nodeValue associated with the internal node (default: "").
      */
     InternalNode(const std::string &l, const std::string &v = " ") : TreeNode(l)
     {
@@ -156,16 +156,16 @@ public:
  * @brief Represents a leaf node in a tree structure.
  *
  * The LeafNode class is a specialization of the TreeNode class that
- * represents a leaf node in a tree. It has a label and a value associated
+ * represents a leaf node in a tree. It has a nodeLabel and a nodeValue associated
  * with it.
  */
 class LeafNode : public TreeNode
 {
 public:
     /**
-     * @brief Constructs a LeafNode object with the specified label and value.
-     * @param l The label of the leaf node.
-     * @param v The value associated with the leaf node.
+     * @brief Constructs a LeafNode object with the specified nodeLabel and nodeValue.
+     * @param l The nodeLabel of the leaf node.
+     * @param v The nodeValue associated with the leaf node.
      */
     LeafNode(const std::string &l, const std::string &v) : TreeNode(l)
     {

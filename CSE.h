@@ -33,7 +33,7 @@ enum class ObjType : int {
 std::vector<std::string> built_in_functions = {"Print", "print","Order", "Y*", "Conc", "Stem", "Stern", "Isinteger", "Isstring",
                                                "Istuple", "Isempty", "dummy", "ItoS"};
 
-bool isOperator(const std::string &label);
+bool isOperator(const std::string &nodeLabel);
 
 class CseNode {
 private:
@@ -227,8 +227,8 @@ public:
     }
 
     // add variable to environment
-    void add_variable(const std::string &identifier, const CseNode &value) {
-        variables[identifier] = value;
+    void add_variable(const std::string &identifier, const CseNode &nodeValue) {
+        variables[identifier] = nodeValue;
     }
 
     void add_variables(const std::vector<std::string> &identifiers,
@@ -494,16 +494,16 @@ public:
                 create_cs(child, cs, current_cs_index);
             }
         } else if (root->getLabel() == "identifier" || root->getLabel() == "integer" || root->getLabel() == "string") {
-            std::string value = root->getValue();
+            std::string nodeValue = root->getValue();
             std::string type = root->getLabel();
             CseNode *leaf;
 
             if (type == "identifier") {
-                leaf = new CseNode(ObjType::IDENTIFIER, value);
+                leaf = new CseNode(ObjType::IDENTIFIER, nodeValue);
             } else if (type == "integer") {
-                leaf = new CseNode(ObjType::INTEGER, value);
+                leaf = new CseNode(ObjType::INTEGER, nodeValue);
             } else if (type == "string") {
-                leaf = new CseNode(ObjType::STRING, value);
+                leaf = new CseNode(ObjType::STRING, nodeValue);
             } else {
                 throw std::runtime_error("Invalid leaf type: " + type);
             }
@@ -530,13 +530,13 @@ public:
                 stack.add_node(top_of_cs);
                 top_of_cs = main_control_structure.pop_and_return_last_node();
             } else if (top_of_cs.get_node_type() == ObjType::IDENTIFIER) {
-                CseNode value;
+                CseNode nodeValue;
                 CseNode value_l;
                 std::vector<CseNode> list;
 
                 try {
-                    value = envs[env_stack.back()]->get_variable(top_of_cs.get_node_value());
-                    stack.add_node(CseNode(value.get_node_type(), value.get_node_value()));
+                    nodeValue = envs[env_stack.back()]->get_variable(top_of_cs.get_node_value());
+                    stack.add_node(CseNode(nodeValue.get_node_type(), nodeValue.get_node_value()));
                 }
                 catch (std::runtime_error &e) {
                     try {
@@ -549,7 +549,7 @@ public:
                             stack.add_node(CseNode(ObjType::LIST, list));
                         }
                         catch (std::runtime_error &e) {
-                            // if node value is in built_in_functions add the node to the stack
+                            // if node nodeValue is in built_in_functions add the node to the stack
                             if (std::find(built_in_functions.begin(), built_in_functions.end(),
                                           top_of_cs.get_node_value()) !=
                                 built_in_functions.end()) {
@@ -576,16 +576,16 @@ public:
                     Env *new_env = new Env(envs[top_of_stack.get_env()]);
                     envs[next_env++] = new_env;
 
-                    CseNode value = stack.pop_and_return_last_node();
+                    CseNode nodeValue = stack.pop_and_return_last_node();
 
-                    if (value.get_node_type() == ObjType::LAMBDA || value.get_node_type() == ObjType::EETA) {
-                        new_env->add_lambda(top_of_stack.get_node_value(), value);
-                    } else if (value.get_node_type() == ObjType::STRING || value.get_node_type() == ObjType::INTEGER) {
-                        new_env->add_variable(top_of_stack.get_node_value(), value);
-                    } else if (value.get_node_type() == ObjType::LIST && !top_of_stack.get_is_single_bound_var()) {
+                    if (nodeValue.get_node_type() == ObjType::LAMBDA || nodeValue.get_node_type() == ObjType::EETA) {
+                        new_env->add_lambda(top_of_stack.get_node_value(), nodeValue);
+                    } else if (nodeValue.get_node_type() == ObjType::STRING || nodeValue.get_node_type() == ObjType::INTEGER) {
+                        new_env->add_variable(top_of_stack.get_node_value(), nodeValue);
+                    } else if (nodeValue.get_node_type() == ObjType::LIST && !top_of_stack.get_is_single_bound_var()) {
                         // TODO
                         std::vector<std::string> var_list = top_of_stack.get_var_list();
-                        std::vector<CseNode> list_items = value.get_list_elements();
+                        std::vector<CseNode> list_items = nodeValue.get_list_elements();
 
 //                        std::vector<std::string> non_list_var;
                         std::vector<std::string> list_var;
@@ -626,10 +626,10 @@ public:
                         if (creating_list) {
                             new_env->add_list(var_list[var_count], temp_list);
                         }
-                    } else if (value.get_node_type() == ObjType::LIST) {
-                        new_env->add_list(top_of_stack.get_node_value(), value.get_list_elements());
+                    } else if (nodeValue.get_node_type() == ObjType::LIST) {
+                        new_env->add_list(top_of_stack.get_node_value(), nodeValue.get_list_elements());
                     } else {
-                        throw std::runtime_error("Invalid object for gamma: " + value.get_node_value());
+                        throw std::runtime_error("Invalid object for gamma: " + nodeValue.get_node_value());
                     }
 
                     env_stack.push_back(next_env - 1);
@@ -642,15 +642,15 @@ public:
                     std::string identifier = top_of_stack.get_node_value();
 
                     if (identifier == "Print" || identifier == "print") {
-                        CseNode value = stack.pop_and_return_last_node();
-                        std::vector<CseNode> list_elements = value.get_list_elements();
+                        CseNode nodeValue = stack.pop_and_return_last_node();
+                        std::vector<CseNode> list_elements = nodeValue.get_list_elements();
 
-                        if (value.get_node_type() == ObjType::LIST) {
+                        if (nodeValue.get_node_type() == ObjType::LIST) {
                             std::cout << "(";
 
                             std::vector<int> count_stack;
 
-                            for (int i = 0; i < value.get_list_elements().size(); i++) {
+                            for (int i = 0; i < nodeValue.get_list_elements().size(); i++) {
                                 if (list_elements[i].get_node_type() == ObjType::LIST) {
                                     count_stack.push_back(std::stoi(list_elements[i].get_node_value()));
                                     std::cout << "(";
@@ -664,72 +664,72 @@ public:
                                         }
 
                                         if (count_stack[count_stack.size() - 1] == 0) {
-                                            if (i != value.get_list_elements().size() - 1)
+                                            if (i != nodeValue.get_list_elements().size() - 1)
                                                 std::cout << "), ";
                                             else
                                                 std::cout << ")";
 
                                             count_stack.pop_back();
                                         } else {
-                                            if (i != value.get_list_elements().size() - 1)
+                                            if (i != nodeValue.get_list_elements().size() - 1)
                                                 std::cout << ", ";
                                         }
                                     } else {
-                                        if (i != value.get_list_elements().size() - 1)
+                                        if (i != nodeValue.get_list_elements().size() - 1)
                                             std::cout << ", ";
                                     }
                                 }
                             }
                             std::cout << ")";
-                        } else if (value.get_node_type() == ObjType::ENV || value.get_node_value() == "dummy") {
+                        } else if (nodeValue.get_node_type() == ObjType::ENV || nodeValue.get_node_value() == "dummy") {
                             std::cout << "dummy";
-                        } else if (value.get_node_type() == ObjType::LAMBDA) {
+                        } else if (nodeValue.get_node_type() == ObjType::LAMBDA) {
                             std::cout << "[lambda closure: ";
-                            std::cout << value.get_node_value() << ": ";
-                            std::cout << value.get_cs_index() << "]";
+                            std::cout << nodeValue.get_node_value() << ": ";
+                            std::cout << nodeValue.get_cs_index() << "]";
                         } else {
-                            std::cout << value.get_node_value();
+                            std::cout << nodeValue.get_node_value();
                         }
                     } else if (identifier == "Isinteger") {
-                        CseNode value = stack.pop_and_return_last_node();
-                        if (value.get_node_type() == ObjType::INTEGER) {
+                        CseNode nodeValue = stack.pop_and_return_last_node();
+                        if (nodeValue.get_node_type() == ObjType::INTEGER) {
                             stack.add_node(CseNode(ObjType::BOOLEAN, "true"));
                         } else {
                             stack.add_node(CseNode(ObjType::BOOLEAN, "false"));
                         }
                     } else if (identifier == "Isstring") {
-                        CseNode value = stack.pop_and_return_last_node();
-                        if (value.get_node_type() == ObjType::STRING) {
+                        CseNode nodeValue = stack.pop_and_return_last_node();
+                        if (nodeValue.get_node_type() == ObjType::STRING) {
                             stack.add_node(CseNode(ObjType::BOOLEAN, "true"));
                         } else {
                             stack.add_node(CseNode(ObjType::BOOLEAN, "false"));
                         }
                     } else if (identifier == "Isempty") {
-                        CseNode value = stack.pop_and_return_last_node();
-                        if (value.get_node_type() == ObjType::LIST) {
-                            if (value.get_list_elements().empty()) {
+                        CseNode nodeValue = stack.pop_and_return_last_node();
+                        if (nodeValue.get_node_type() == ObjType::LIST) {
+                            if (nodeValue.get_list_elements().empty()) {
                                 stack.add_node(CseNode(ObjType::BOOLEAN, "true"));
                             } else {
                                 stack.add_node(CseNode(ObjType::BOOLEAN, "false"));
                             }
                         } else {
-                            throw std::runtime_error("Invalid type for IsEmpty: " + value.get_node_value());
+                            throw std::runtime_error("Invalid type for IsEmpty: " + nodeValue.get_node_value());
                         }
                     } else if (identifier == "Istuple") {
-                        CseNode value = stack.pop_and_return_last_node();
+                        CseNode nodeValue = stack.pop_and_return_last_node();
 
-                        if (value.get_node_type() == ObjType::LIST) {
+                        if (nodeValue.get_node_type() == ObjType::LIST) {
                             stack.add_node(CseNode(ObjType::BOOLEAN, "true"));
                         } else {
                             stack.add_node(CseNode(ObjType::BOOLEAN, "false"));
                         }
                     } else if (identifier == "Order") {
-                        CseNode value = stack.pop_and_return_last_node();
-                        if (value.get_node_type() == ObjType::LIST) {
+                        CseNode nodeValue = stack.pop_and_return_last_node();
+                        if (nodeValue.get_node_type() == ObjType::LIST) {
                             int count = 0;
                             int list_elem_skip = 0;
 
-                            for (const auto &i: value.get_list_elements()) {
+                            for (const auto &i: nodeValue.get_list_elements()) {
                                 if (i.get_node_type() == ObjType::LIST && list_elem_skip == 0) {
                                     list_elem_skip += std::stoi(i.get_node_value());
                                     count++;
@@ -743,7 +743,7 @@ public:
 
                             stack.add_node(CseNode(ObjType::INTEGER, std::to_string(count)));
                         } else {
-                            throw std::runtime_error("Invalid type for Order: " + value.get_node_value());
+                            throw std::runtime_error("Invalid type for Order: " + nodeValue.get_node_value());
                         }
                     } else if (identifier == "Conc") {
                         CseNode first_arg = stack.pop_and_return_last_node();
@@ -1067,11 +1067,11 @@ public:
     }
 };
 
-bool isOperator(const std::string &label) {
+bool isOperator(const std::string &nodeLabel) {
     std::vector<std::string> operators_ = {"+", "-", "/", "*", "aug", "neg", "not", "eq", "gr", "ge", "ls", "le", "ne",
                                            "or", "&"};
 
-    auto it = std::find(operators_.begin(), operators_.end(), label);
+    auto it = std::find(operators_.begin(), operators_.end(), nodeLabel);
     return it != operators_.end();
 }
 
