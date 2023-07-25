@@ -1,9 +1,9 @@
-#ifndef TREE_H
-#define TREE_H
+#ifndef CUSTOM_TREE_H
+#define CUSTOM_TREE_H
 
 #include "TreeNode.h"
 
-void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode);
+void generateSyntaxTree(CustomTreeNode *currentNode, CustomTreeNode *parentNode);
 
 /**
  * @brief Represents the Custom Tree for a program.
@@ -108,13 +108,13 @@ public:
     /**
      * @brief Generates the Standardized CustomTree (ST) from the Abstract Syntax CustomTree (AST).
      *
-     * This function calls the generateST() function to generate the ST from the AST.
+     * This function calls the generateSyntaxTree() function to generate the ST from the AST.
      * It should be called when the AST is no longer needed to avoid memory leaks.
      */
     static void generate()
     {
         releaseASTMemory();
-        generateST(customTree->stRoot, nullptr);
+        generateSyntaxTree(customTree->stRoot, nullptr);
     }
 };
 
@@ -123,11 +123,11 @@ CustomTree *CustomTree::customTree = new CustomTree(); // Initialize the singlet
 /**
  * Generates the Syntax CustomTree (ST) by modifying the given customTree structure.
  */
-void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
+void generateSyntaxTree(CustomTreeNode *currentNode, CustomTreeNode *parentNode = nullptr)
 {
     if (currentNode == nullptr)
     {
-        return; // If the current node is nullptr, exit the function
+        return; 
     }
 
     if (currentNode->getChildCount() != 0)
@@ -135,7 +135,7 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
         std::vector<CustomTreeNode *> children = currentNode->getChildren(); // Get the children of the current node
         for (CustomTreeNode *child : children)
         {
-            generateST(child, currentNode); // Recursively generate the syntax customTree for each child
+            generateSyntaxTree(child, currentNode); // Recursively generate the syntax customTree for each child
             currentNode->removeChild(0);    // Remove the processed child from the current node
         }
     }
@@ -145,9 +145,9 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
     // Define a static vector of binary operators
     static std::vector<std::string> binaryOperators = {
         "+", "-", "*", "/", "**", "gr", "ge", "ls", "le", "aug", "or", "&", "eq", "ne"};
-
+    // Identify and process specific node types
     if (currentNode->getLabel() == "let")
-    {
+    {   // Process "let" nodes
         if (currentNode->getChildCount() == 2)
         {
             std::vector<CustomTreeNode *> children = currentNode->getChildren();
@@ -508,4 +508,4 @@ void generateST(CustomTreeNode *currentNode, CustomTreeNode *parentNode)
     }
 }
 
-#endif // TREE_H
+#endif // CUSTOM_TREE_H
