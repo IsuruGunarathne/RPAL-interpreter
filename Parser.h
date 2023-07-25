@@ -38,7 +38,7 @@ void Vl();
 class Parser
 {
 public:
-    static std::vector<TreeNode *> nodeStack;
+    static std::vector<CustomTreeNode *> nodeStack;
 
     /**
      * Parses the input tokens and constructs the Abstract Syntax Tree (AST).
@@ -72,10 +72,10 @@ public:
     }
 };
 
-std::vector<TreeNode *> Parser::nodeStack;
+std::vector<CustomTreeNode *> Parser::nodeStack;
 
 /**
- * Constructs a new TreeNode with the specified nodeLabel, number of children, leaf status, and nodeValue.
+ * Constructs a new CustomTreeNode with the specified nodeLabel, number of children, leaf status, and nodeValue.
  * Adds the constructed node to the nodeStack.
  * @param nodeLabel The nodeLabel of the node.
  * @param num The number of children the node will have.
@@ -84,7 +84,7 @@ std::vector<TreeNode *> Parser::nodeStack;
  */
 void build_tree(const std::string &nodeLabel, const int &num, const bool isLeaf, const std::string &nodeValue = "")
 {
-    TreeNode *node;
+    CustomTreeNode *node;
 
     // Create a leaf node if isLeaf is true, otherwise create an internal node
     if (isLeaf)
@@ -99,12 +99,12 @@ void build_tree(const std::string &nodeLabel, const int &num, const bool isLeaf,
     // Add the children from the nodeStack to the newly created node
     for (int i = 0; i < num; i++)
     {
-        node->addChild(Parser::nodeStack.back());
+        node->appendChild(Parser::nodeStack.back());
         Parser::nodeStack.pop_back();
     }
 
     // Reverse the order of the children
-    node->reverseChildren();
+    node->reverseChildrenOrder();
 
     // Push the constructed node onto the nodeStack
     Parser::nodeStack.push_back(node);

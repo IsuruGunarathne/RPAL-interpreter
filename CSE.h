@@ -422,7 +422,7 @@ public:
     CSE() = default;
 
     // create control structures
-    void create_cs(TreeNode *root, ControlStructure *current_cs = nullptr, int current_cs_index = -1) {
+    void create_cs(CustomTreeNode *root, ControlStructure *current_cs = nullptr, int current_cs_index = -1) {
         ControlStructure *cs;
 
         if (next_cs == -1) {

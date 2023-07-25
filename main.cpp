@@ -65,12 +65,12 @@ void printGraphvizWarning()
 /**
  * Helper function to generate the dot file contents recursively.
  *
- * @param node The current TreeNode being processed.
+ * @param node The current CustomTreeNode being processed.
  * @param file The ofstream object for writing the dot file.
  * @param parent The parent node ID (default: -1).
  * @return The ID of the current node.
  */
-int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, int nodeCount = 0)
+int generateDotFileHelper(CustomTreeNode *node, std::ofstream &file, int parent = -1, int nodeCount = 0)
 {
     int currentNode = nodeCount;
 
@@ -124,7 +124,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     }
 
     // Recursively generate dot file contents for each child node
-    for (TreeNode *child : node->getChildren())
+    for (CustomTreeNode *child : node->getChildren())
     {
         nextNodeCount = generateDotFileHelper(child, file, currentNode, nextNodeCount);
     }
@@ -137,7 +137,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
  *
  * @param root The root node of the AST.
  */
-void generateDotFile(TreeNode *root, std::string filename)
+void generateDotFile(CustomTreeNode *root, std::string filename)
 {
     // std::ofstream file("Visualizations/tree.dot");
      std::string f_name = std::string(R"(D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\)") + filename;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
     Parser::parse();
     TokenStorage::destroyInstance();
 
-    TreeNode *root = Tree::getInstance().getASTRoot();
+    CustomTreeNode *root = Tree::getInstance().getASTRoot();
 
     if (visualizeAst)
     {
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
     }
 
     Tree::generate();
-    TreeNode *st_root = Tree::getInstance().getSTRoot();
+    CustomTreeNode *st_root = Tree::getInstance().getSTRoot();
 
     if (visualizeSt)
     {

@@ -7,35 +7,35 @@
 #include <algorithm>
 
 /**
- * @brief Represents a node in a tree structure.
+ * @brief Represents a custom tree node.
  *
- * The TreeNode class represents a node in a tree. It contains a nodeLabel,
- * a vector of child nodes, and an optional nodeValue. It provides methods
- * to add children, reverse the order of children, and retrieve information
- * about the node.
+ * The CustomTreeNode class represents a node in a custom tree structure.
+ * It contains a label, a vector of child nodes, and an optional value.
+ * It provides methods to add children, reverse the order of children, and
+ * retrieve information about the node.
  */
-class TreeNode
+class CustomTreeNode
 {
 private:
     std::string nodeLabel;                // The nodeLabel of the node
-    std::vector<TreeNode *> children; // The child nodes of the current node
+    std::vector<CustomTreeNode *> children; // The child nodes of the current node
     std::string nodeValue;                // The nodeValue associated with the node
 
 public:
     /**
-     * @brief Constructs a TreeNode object with the specified nodeLabel.
-     * @param l The nodeLabel of the node.
+     * @brief Constructs a CustomTreeNode object with the specified label.
+     * @param label The label of the node.
      */
-    explicit TreeNode(std::string l) : nodeLabel(std::move(l))
+    explicit CustomTreeNode(std::string l) : nodeLabel(std::move(l))
     {
-        children = std::vector<TreeNode *>();
+        children = std::vector<CustomTreeNode *>();
     }
 
     /**
      * @brief Adds a child node to the current node.
      * @param child The child node to add.
      */
-    void addChild(TreeNode *child)
+    void appendChild(CustomTreeNode *child)
     {
         children.push_back(child);
     }
@@ -43,11 +43,35 @@ public:
     /**
      * @brief Reverses the order of the child nodes.
      */
-    void reverseChildren()
+    void reverseChildrenOrder()
     {
         std::reverse(children.begin(), children.end());
     }
-
+    
+    /**
+     * @brief Returns the number of child nodes.
+     * @return The number of child nodes.
+     */
+    int getChildCount()
+    {
+        return children.size();
+    }
+        /**
+     * @brief Returns the nodeLabel of the node.
+     * @return The nodeLabel of the node as a string.
+     */
+    std::string getLabel() const
+    {
+        return nodeLabel;
+    }
+        /**
+     * @brief Returns a reference to the vector of child nodes.
+     * @return A reference to the vector of child nodes.
+     */
+    std::vector<CustomTreeNode *> & getChildren()
+    {
+        return children;
+    }
     /**
      * @brief Removes a child node from the current node.
      * @param index The index of the child node to remove.
@@ -67,62 +91,34 @@ public:
 
         children.erase(children.begin() + index);
     }
-
     /**
-     * @brief Returns the number of child nodes.
-     * @return The number of child nodes.
+     * @brief Returns the value associated with the node.
+     * @return The value of the node as a string.
      */
-    int getNumChildren()
-    {
-        return children.size();
-    }
-
-    /**
-     * @brief Returns the nodeLabel of the node.
-     * @return The nodeLabel of the node as a string.
-     */
-    std::string getLabel()
-    {
-        return nodeLabel;
-    }
-
-    /**
-     * @brief Returns a reference to the vector of child nodes.
-     * @return A reference to the vector of child nodes.
-     */
-    std::vector<TreeNode *> &getChildren()
-    {
-        return children;
-    }
-
-    /**
-     * @brief Returns the nodeValue associated with the node.
-     * @return The nodeValue of the node as a string.
-     */
-    virtual std::string getValue()
+    virtual std::string getValue() const
     {
         return nodeValue;
     }
 
     /**
-     * @brief Sets the nodeValue associated with the node.
-     * @param v The nodeValue to set.
+     * @brief Sets the value associated with the node.
+     * @param value The value to set.
      */
-    void setValue(std::string v)
+    void setValue(std::string value)
     {
-        nodeValue = std::move(v);
+        nodeValue = std::move(value);
     }
 
     /**
-     * @brief Releases the memory occupied by a TreeNode and its child nodes.
+     * @brief Releases the memory occupied by a CustomTreeNode and its child nodes.
      * @param node The node to release memory for.
      */
-    static void releaseNodeMemory(TreeNode *node)
+    static void releaseNodeMemory(CustomTreeNode *node)
     {
         if (node == nullptr)
             return;
 
-        for (TreeNode *child : node->getChildren())
+        for (CustomTreeNode *child : node->getChildren())
         {
             releaseNodeMemory(child);
         }
@@ -134,11 +130,11 @@ public:
 /**
  * @brief Represents an internal node in a tree structure.
  *
- * The InternalNode class is a specialization of the TreeNode class
+ * The InternalNode class is a specialization of the CustomTreeNode class
  * that represents an internal node in a tree. It has a nodeLabel and an
  * optional nodeValue associated with it.
  */
-class InternalNode : public TreeNode
+class InternalNode : public CustomTreeNode
 {
 public:
     /**
@@ -146,7 +142,7 @@ public:
      * @param l The nodeLabel of the internal node.
      * @param v The nodeValue associated with the internal node (default: "").
      */
-    InternalNode(const std::string &l, const std::string &v = " ") : TreeNode(l)
+    InternalNode(const std::string &l, const std::string &v = " ") : CustomTreeNode(l)
     {
         setValue(" ");
     }
@@ -155,11 +151,11 @@ public:
 /**
  * @brief Represents a leaf node in a tree structure.
  *
- * The LeafNode class is a specialization of the TreeNode class that
+ * The LeafNode class is a specialization of the CustomTreeNode class that
  * represents a leaf node in a tree. It has a nodeLabel and a nodeValue associated
  * with it.
  */
-class LeafNode : public TreeNode
+class LeafNode : public CustomTreeNode
 {
 public:
     /**
@@ -167,12 +163,12 @@ public:
      * @param l The nodeLabel of the leaf node.
      * @param v The nodeValue associated with the leaf node.
      */
-    LeafNode(const std::string &l, const std::string &v) : TreeNode(l)
+    LeafNode(const std::string &l, const std::string &v) : CustomTreeNode(l)
     {
         setValue(v);
     }
 
-    void addChild(TreeNode *child) = delete;
+    void appendChild(CustomTreeNode *child) = delete;
 };
 
 #endif // TREENODE_H
