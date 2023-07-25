@@ -1,10 +1,11 @@
-#ifndef TOKENSTORAGE_H
-#define TOKENSTORAGE_H
+#ifndef TOKENSSTORAGE_H
+#define TOKENSSTORAGE_H
 
 #include "Lexer.h"
 #include <vector>
 
 /**
+ * 
  * The TokenStorage class is responsible for storing and managing tokens during parsing.
  * It implements the singleton pattern to ensure only one instance exists throughout the program.
  */
@@ -13,7 +14,7 @@ class TokenStorage
 private:
     static TokenStorage instance; // Singleton instance
     std::vector<Token> tokens;    // Vector to store tokens
-    int currentPosition;          // Current position in the tokens vector
+    int currPosition;          // Current position in the tokens vector
     Lexer *lexer;                 // Pointer to the lexer
 
     // Private constructor to prevent instantiation
@@ -36,7 +37,7 @@ private:
         {
             token = lexer->getNextToken();
             tokens.push_back(token);
-        } while (token.type != token_type::END_OF_FILE);
+        } while (token.type != type_of_token::END_OF_FILE);
     }
 
 public:
@@ -57,7 +58,7 @@ public:
     {
         this->lexer = &lexer;
         setTokens();
-        currentPosition = 0;
+        currPosition = 0;
     }
 
     /**
@@ -66,7 +67,7 @@ public:
      */
     Token &top()
     {
-        return tokens[currentPosition];
+        return tokens[currPosition];
     }
 
     /**
@@ -75,7 +76,7 @@ public:
      */
     Token &pop()
     {
-        return tokens[currentPosition++];
+        return tokens[currPosition++];
     }
 
     /**
@@ -83,20 +84,20 @@ public:
      */
     void reset()
     {
-        currentPosition = 0;
+        currPosition = 0;
     }
 
     /**
      * Clears the tokens vector and sets the lexer to nullptr.
      * This method should be called when the TokenStorage instance is no longer needed.
      */
-    static void destroyInstance()
+    static void clearInstance()
     {
-        instance.lexer = nullptr;
+        instance.lexer = 0;
         instance.tokens.clear();
     }
 };
 
 TokenStorage TokenStorage::instance; // Initialize the static instance
 
-#endif // TOKENSTORAGE_H
+#endif // TOKENSSTORAGE_H
