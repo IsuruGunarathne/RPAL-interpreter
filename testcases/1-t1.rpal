@@ -1,0 +1,3 @@
+let posneg x = x >= 0 -> 'Positive'| 'Negative'
+in
+print(posneg 10)

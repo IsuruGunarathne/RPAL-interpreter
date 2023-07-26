@@ -1,0 +1,7 @@
+let rec sumofn (n, store) =
+    n eq 0 -> store | sumofn (n-1, store+n)
+in
+let sumoffirstn (n) = 
+sumofn (n, 0)
+in
+print(sumoffirstn(5))

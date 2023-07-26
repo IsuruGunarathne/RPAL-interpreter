@@ -1,0 +1,9 @@
+let rec mod2 x = 
+    let temp = x < 0 -> -x | x
+    in
+    temp < 2 -> temp | mod2(temp-2)
+in
+let isodd x = 
+    mod2 x eq 1 -> 'Odd' | 'Even'
+in
+print(isodd (-8))
