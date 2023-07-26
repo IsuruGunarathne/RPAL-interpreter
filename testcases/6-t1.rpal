@@ -1,0 +1,21 @@
+let rec mod10 x = 
+    let temp = x < 0 -> -x | x
+    in
+    temp < 10 -> temp | mod10(temp-10)
+in
+let rec rev_helper (x, acc) = 
+            x eq 0 -> acc | rev_helper (x / 10, acc*10 + mod10 x)
+in
+let rec ispal x = 
+    let rec rev x = 
+        rev_helper(x, 0)
+    in
+    x eq rev x -> true | false
+in
+let rec palrange(l, r, store) = 
+    l eq r -> store | ispal l -> palrange(l+1, r, store aug l) | palrange(l+1, r, store)
+in
+let palinrange(l, r) = 
+    palrange(l, r, nil)
+in
+print(palinrange(100, 200))

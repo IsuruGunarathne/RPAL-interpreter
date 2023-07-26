@@ -1,0 +1,6 @@
+let f (a, b, c) = 
+    let max (x, y) = x > y -> x | y
+    in
+    max (max (a, b), c)
+in
+print (f (-2, -7, -1))

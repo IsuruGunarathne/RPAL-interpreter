@@ -1,0 +1,7 @@
+let fibonacci(left, right) =
+    let rec fib(x, y, l, r, terms) =
+        x > r -> print (terms)
+        | x < l -> fib(y, x+y, l, r, terms)
+        | fib(y, x+y, l, r, terms aug x)
+    in fib(0, 1, left, right, nil)
+in fibonacci(10, 50)
