@@ -83,4 +83,5 @@ echo[
 .\rpal20 testcases/vectorsum
 echo[
 .\rpal20 testcases/z.txt
+echo last line should print (nil, 1, 2, (3), (4, 5, (3, 4), 6))
 pause

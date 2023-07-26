@@ -677,75 +677,79 @@ public:
 
                     std::string identifier = top_of_stack.get_value_of_node();
 
-                    if (identifier == "Print" || identifier == "print")
-                    {
-                        CseNode nodeValue = stack.pop_last_node_return();
-                        std::vector<CseNode> listOfElements = nodeValue.get_list_elements();
+                    if (identifier == "Print" || identifier == "print") {
+                    CseNode value = stack.pop_last_node_return();
+                    std::vector<CseNode> list_elements = value.get_list_elements();
 
-                        if (nodeValue.get_type_of_node() == TypeOfObject::LIST)
-                        {
-                            std::cout << "(";
+                    if (value.get_type_of_node() == TypeOfObject::LIST) {
+                        std::cout << "(";
 
-                            std::vector<int> count_stack;
+                        std::vector<int> count_stack;
 
-                            for (int i = 0; i < nodeValue.get_list_elements().size(); i++)
-                            {
-                                if (listOfElements[i].get_type_of_node() == TypeOfObject::LIST)
-                                {
-                                    count_stack.push_back(std::stoi(listOfElements[i].get_value_of_node()));
+                        for (int i = 0; i < value.get_list_elements().size(); i++) {
+                            if (list_elements[i].get_type_of_node() == TypeOfObject::LIST) {
+                                if (std::stoi(list_elements[i].get_value_of_node()) == 0) {
+                                    if (i == list_elements.size() - 1) {
+                                        std::cout << "nil";
+                                    } else {
+                                        std::cout << "nil, ";
+                                    }
+                                } else {
+                                    for (int &count: count_stack) {
+                                        count--;
+                                    }
+
+                                    count_stack.push_back(std::stoi(list_elements[i].get_value_of_node()));
                                     std::cout << "(";
                                 }
-                                else
-                                {
-                                    std::cout << listOfElements[i].get_value_of_node();
+                            } else {
+                                std::cout << list_elements[i].get_value_of_node();
 
-                                    if (!count_stack.empty())
-                                    {
-                                        // reduce 1 from all firstElements in count_stack
-                                        for (int &count : count_stack)
-                                        {
-                                            count--;
-                                        }
+                                if (!count_stack.empty()) {
+                                    // reduce 1 from all elements in count_stack
+                                    for (int &count: count_stack) {
+                                        count--;
+                                    }
 
-                                        if (count_stack[count_stack.size() - 1] == 0)
-                                        {
-                                            if (i != nodeValue.get_list_elements().size() - 1)
-                                                std::cout << "), ";
-                                            else
-                                                std::cout << ")";
+                                    if (count_stack[count_stack.size() - 1] == 0) {
+                                        int finished_lists = 0;
 
+                                        while (count_stack[count_stack.size() - 1] == 0) {
+                                            finished_lists++;
                                             count_stack.pop_back();
                                         }
-                                        else
-                                        {
-                                            if (i != nodeValue.get_list_elements().size() - 1)
-                                                std::cout << ", ";
+                                        if (i != value.get_list_elements().size() - 1) {
+                                            for (int j = 0; j < finished_lists - 1; j++) {
+                                                std::cout << ")";
+                                            }
+
+                                            std::cout << "), ";
+                                        } else {
+                                            for (int j = 0; j < finished_lists; j++) {
+                                                std::cout << ")";
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        if (i != nodeValue.get_list_elements().size() - 1)
+                                    } else {
+                                        if (i != value.get_list_elements().size() - 1)
                                             std::cout << ", ";
                                     }
+                                } else {
+                                    if (i != value.get_list_elements().size() - 1)
+                                        std::cout << ", ";
                                 }
                             }
-                            std::cout << ")";
                         }
-                        else if (nodeValue.get_type_of_node() == TypeOfObject::ENVIRONMENT || nodeValue.get_value_of_node() == "dummy")
-                        {
-                            std::cout << "dummy";
-                        }
-                        else if (nodeValue.get_type_of_node() == TypeOfObject::LAMBDA)
-                        {
-                            std::cout << "[lambda closure: ";
-                            std::cout << nodeValue.get_value_of_node() << ": ";
-                            std::cout << nodeValue.get_cs_index() << "]";
-                        }
-                        else
-                        {
-                            std::cout << nodeValue.get_value_of_node();
-                        }
+                        std::cout << ")";
+                    } else if (value.get_type_of_node() == TypeOfObject::ENVIRONMENT || value.get_value_of_node() == "dummy") {
+                        std::cout << "dummy";
+                    } else if (value.get_type_of_node() == TypeOfObject::LAMBDA) {
+                        std::cout << "[lambda closure: ";
+                        std::cout << value.get_value_of_node() << ": ";
+                        std::cout << value.get_cs_index() << "]";
+                    } else {
+                        std::cout << value.get_value_of_node();
                     }
+                }
                     else if (identifier == "Isinteger")
                     {
                         CseNode nodeValue = stack.pop_last_node_return();
