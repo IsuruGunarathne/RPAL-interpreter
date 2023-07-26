@@ -1,0 +1,2 @@
+let greatest_number a b = a > b -> a | b
+in Print((-2) @greatest_number (-7) @greatest_number (-1))

@@ -1,0 +1,2 @@
+let rec odd_even x = x eq 0 -> 'Even' | x eq 1 -> 'Odd' | x < 0 -> odd_even (x + 2) | odd_even (x - 2)
+in Print(odd_even(17))

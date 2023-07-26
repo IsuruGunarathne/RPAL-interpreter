@@ -1,0 +1,2 @@
+let greatest_number a b = a > b -> a | b
+in Print(100 @greatest_number 100 @greatest_number 100)

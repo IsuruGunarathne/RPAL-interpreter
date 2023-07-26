@@ -1,0 +1,9 @@
+let rec find_palindromes l r tupple = l gr r -> tupple
+                                    | Rev l nil 0 -> find_palindromes (l+1) r (tupple aug l)
+                                    | find_palindromes (l+1) r tupple
+            where rec Rev n tupple r = n ne 0 -> Rev (n/10) (tupple aug (n-(n/10)*10)) (r+1)
+                | is_palindrome 1 tupple r
+            where rec is_palindrome l tupple r = l gr r -> true
+                                            | (tupple l) ne (tupple r) -> false
+                                            | is_palindrome (l+1) tupple (r-1)
+                        in Print(find_palindromes 100 200 nil)

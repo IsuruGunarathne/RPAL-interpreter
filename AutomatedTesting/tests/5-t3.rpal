@@ -1,0 +1,6 @@
+let rec Rev n tupple r = n ne 0 -> Rev (n/10) (tupple aug (n-(n/10)*10)) (r+1)
+                | is_palindrome 1 tupple r
+            where rec is_palindrome l tupple r = l gr r -> 'Palindrome'
+                                            | (tupple l) ne (tupple r) -> 'Not a palindrome'
+                                            | is_palindrome (l+1) tupple (r-1)
+                        in Print(Rev 1001 nil 0)

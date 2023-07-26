@@ -1,0 +1,2 @@
+let rec sum_of n = n eq 0 -> 0 | n + sum_of (n - 1)
+in Print(sum_of 10)

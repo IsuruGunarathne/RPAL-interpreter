@@ -1,0 +1,2 @@
+let is_positive(x) = x ge 0 -> 'Positive' | 'Negative'
+in Print(is_positive(-15))

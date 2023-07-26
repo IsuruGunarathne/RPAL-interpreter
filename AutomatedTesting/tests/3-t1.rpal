@@ -1,0 +1,4 @@
+let rec fib_seires (left, right, one, two, arr) = right ls one -> arr
+                                                | left le one -> fib_seires (left, right, two, one + two, arr aug one)
+                                                | fib_seires (left, right, two, one + two, arr)
+in Print(fib_seires (0, 100, 0, 1, nil))
