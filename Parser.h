@@ -1,67 +1,65 @@
 #ifndef RPAL_CLION_PARSER_H
 #define RPAL_CLION_PARSER_H
-
+#include <vector>
 #include "Token.h"
 #include "Lexer.h"
 #include "TokenStorage.h"
 #include "Tree.h"
 #include "TreeNode.h"
 
-#include <vector>
 
-// function prototypes
-void E();
-void Ew();
-void T();
-void Ta();
-void Tc();
-void B();
-void Bt();
-void Bs();
-void Bp();
-void A();
-void At();
-void Af();
-void Ap();
-void R();
-void Rn();
-void D();
-void Da();
-void Dr();
-void Db();
-void Vb();
-void Vl();
+void parseExpression();
+void parseExpressionWithWhere();
 
-/**
- * The Parser class is responsible for parsing a sequence of tokens and constructing the Abstract Syntax CustomTree (AST).
- */
+void parseTerm();
+void parseTermWithAugmentation();
+void parseTermWithCondition();
+
+void parseBooleanExpression();
+void parseBooleanTerm();
+void parseBooleanFactor();
+void parseBooleanPredicate();
+
+void parseArithmeticExpression();
+void parseArithmeticTerm();
+void parseArithmeticFactor();
+void parseArithmeticPower();
+
+void parseAtomicExpression();
+void parseAtomicPrimary();
+
+void parseDeclaration();
+void parseDeclarationWithWithinClause();
+void parseRecursiveDeclaration();
+void parseDeclarationBody();
+
+void parseVariableBinding();
+void parseVariableList();
+
+// Constructing an AST from token sequences.
 class Parser
 {
 public:
-    static std::vector<CustomTreeNode *> nodeStack;
-
-    /**
-     * Parses the input tokens and constructs the Abstract Syntax CustomTree (AST).
-     */
+    static std::vector<TreeNode *> nodeStack;
     static void parse()
     {
         TokenStorage &tokenStorage = TokenStorage::getInstance();
         Token token = tokenStorage.top();
 
         // Check if the input token is the end of file token
-        if (token.type == type_of_token::END_OF_FILE)
+        if (token.type == token_type::END_OF_FILE)
         {
             return; // No further parsing required, return from the function
         }
         else
         {
-            E(); // Start parsing the expression
+            parseExpression(); // Start parsing the expression
 
             // Check if the next token is the end of file token
-            if (tokenStorage.top().type == type_of_token::END_OF_FILE)
+            if (tokenStorage.top().type == token_type::END_OF_FILE)
             {
                 // Set the root of the AST to the last node in the nodeStack
-                CustomTree::getInstance().setASTRoot(Parser::nodeStack.back());
+                Tree::getInstance().setASTRoot(Parser::nodeStack.back());
                 return; // Parsing completed, return from the function
             }
             else
@@ -72,39 +70,39 @@ public:
     }
 };
 
-std::vector<CustomTreeNode *> Parser::nodeStack;
+std::vector<TreeNode *> Parser::nodeStack;
 
 /**
- * Constructs a new CustomTreeNode with the specified labelOfNode, number of children, leaf status, and nodeValue.
+ * Constructs a new TreeNode with the specified label, number of children, leaf status, and value.
  * Adds the constructed node to the nodeStack.
- * @param labelOfNode The labelOfNode of the node.
+ * @param label The label of the node.
  * @param num The number of children the node will have.
  * @param isLeaf A boolean indicating whether the node is a leaf node or not.
- * @param nodeValue The nodeValue associated with the node (only applicable for leaf nodes).
+ * @param value The value associated with the node (only applicable for leaf nodes).
  */
-void build_tree(const std::string &labelOfNode, const int &num, const bool isLeaf, const std::string &nodeValue = "")
+void build_tree(const std::string &label, const int &num, const bool isLeaf, const std::string &value = "")
 {
-    CustomTreeNode *node;
+    TreeNode *node;
 
     // Create a leaf node if isLeaf is true, otherwise create an internal node
     if (isLeaf)
     {
-        node = new LeafNode(labelOfNode, nodeValue);
+        node = new LeafNode(label, value);
     }
     else
     {
-        node = new InternalNode(labelOfNode);
+        node = new InternalNode(label);
     }
 
     // Add the children from the nodeStack to the newly created node
     for (int i = 0; i < num; i++)
     {
-        node->appendChild(Parser::nodeStack.back());
+        node->addChild(Parser::nodeStack.back());
         Parser::nodeStack.pop_back();
     }
 
     // Reverse the order of the children
-    node->reverseChildrenOrder();
+    node->reverseChildren();
 
     // Push the constructed node onto the nodeStack
     Parser::nodeStack.push_back(node);
@@ -113,25 +111,25 @@ void build_tree(const std::string &labelOfNode, const int &num, const bool isLea
 /**
  * Parses the expression starting with E.
  * Handles the grammar rule E -> "let" D "in" E | "fn" Vb { Vb } "." E | Ew.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void E()
+void parseExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
     // Check if the current token is "let"
-    if (tokenStorage.top().nodeValue == "let")
+    if (tokenStorage.top().value == "let")
     {
         tokenStorage.pop();
-        D();
+        parseDeclaration();
 
         // Check if the next token is "in"
-        if (tokenStorage.top().nodeValue == "in")
+        if (tokenStorage.top().value == "in")
         {
             tokenStorage.pop();
-            E();
+            parseExpression();
         }
         else
         {
@@ -142,15 +140,15 @@ void E()
         build_tree("let", 2, false);
     }
     // Check if the current token is "fn"
-    else if (tokenStorage.top().nodeValue == "fn")
+    else if (tokenStorage.top().value == "fn")
     {
         tokenStorage.pop();
         int n = 0;
 
         // Process identifiers until a non-identifier token is encountered
-        while (tokenStorage.top().type == type_of_token::IDENTIFIER)
+        while (tokenStorage.top().type == token_type::IDENTIFIER)
         {
-            Vb();
+            parseVariableBinding();
             n++;
         }
 
@@ -160,10 +158,10 @@ void E()
         }
 
         // Check if the next token is "."
-        if (tokenStorage.top().nodeValue == ".")
+        if (tokenStorage.top().value == ".")
         {
             tokenStorage.pop();
-            E();
+            parseExpression();
         }
         else
         {
@@ -175,27 +173,27 @@ void E()
     }
     else
     {
-        Ew();
+        parseExpressionWithWhere();
     }
 }
 
 /**
  * Parses the expression starting with Ew.
  * Handles the grammar rule Ew -> T [ "where" Dr ].
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Ew()
+void parseExpressionWithWhere()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    T();
+    parseTerm();
 
     // Check if the next token is "where"
-    if (tokenStorage.top().nodeValue == "where")
+    if (tokenStorage.top().value == "where")
     {
         tokenStorage.pop();
-        Dr();
+        parseRecursiveDeclaration();
         build_tree("where", 2, false);
     }
 }
@@ -203,21 +201,21 @@ void Ew()
 /**
  * Parses the expression starting with T.
  * Handles the grammar rule T -> Ta { "," Ta }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void T()
+void parseTerm()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Ta();
+    parseTermWithAugmentation();
     int n = 0;
 
     // Process additional T expressions separated by commas
-    while (tokenStorage.top().nodeValue == ",")
+    while (tokenStorage.top().value == ",")
     {
         tokenStorage.pop();
-        Ta();
+        parseTermWithAugmentation();
         n++;
     }
 
@@ -230,20 +228,20 @@ void T()
 /**
  * Parses the expression starting with Ta.
  * Handles the grammar rule Ta -> Tc { "aug" Tc }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Ta()
+void parseTermWithAugmentation()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Tc();
+    parseTermWithCondition();
 
     // Process additional Tc expressions separated by "aug" keyword
-    while (tokenStorage.top().nodeValue == "aug")
+    while (tokenStorage.top().value == "aug")
     {
         tokenStorage.pop();
-        Tc();
+        parseTermWithCondition();
         build_tree("aug", 2, false);
     }
 }
@@ -251,26 +249,26 @@ void Ta()
 /**
  * Parses the expression starting with Tc.
  * Handles the grammar rule Tc -> B [ "->" Tc [ "|" Tc ] ].
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Tc()
+void parseTermWithCondition()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    B();
+    parseBooleanExpression();
 
     // Check if the next token is "->"
-    if (tokenStorage.top().nodeValue == "->")
+    if (tokenStorage.top().value == "->")
     {
         tokenStorage.pop();
-        Tc();
+        parseTermWithCondition();
 
         // Check if the next token is "|"
-        if (tokenStorage.top().nodeValue == "|")
+        if (tokenStorage.top().value == "|")
         {
             tokenStorage.pop();
-            Tc();
+            parseTermWithCondition();
             build_tree("->", 3, false);
         }
         else
@@ -283,20 +281,20 @@ void Tc()
 /**
  * Parses the expression starting with B.
  * Handles the grammar rule B -> Bt { "or" Bt }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void B()
+void parseBooleanExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Bt();
+    parseBooleanTerm();
 
     // Process additional Bt expressions separated by "or" keyword
-    while (tokenStorage.top().nodeValue == "or")
+    while (tokenStorage.top().value == "or")
     {
         tokenStorage.pop();
-        Bt();
+        parseBooleanTerm();
         build_tree("or", 2, false);
     }
 }
@@ -304,20 +302,20 @@ void B()
 /**
  * Parses the expression starting with Bt.
  * Handles the grammar rule Bt -> Bs { "&" Bs }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Bt()
+void parseBooleanTerm()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Bs();
+    parseBooleanFactor();
 
     // Process additional Bs expressions separated by "&" keyword
-    while (tokenStorage.top().nodeValue == "&")
+    while (tokenStorage.top().value == "&")
     {
         tokenStorage.pop();
-        Bs();
+        parseBooleanFactor();
         build_tree("&", 2, false);
     }
 }
@@ -325,72 +323,72 @@ void Bt()
 /**
  * Parses the expression starting with Bs.
  * Handles the grammar rule Bs -> "not" Bp | Bp.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Bs()
+void parseBooleanFactor()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    if (tokenStorage.top().nodeValue == "not")
+    if (tokenStorage.top().value == "not")
     {
         tokenStorage.pop();
-        Bp();
+        parseBooleanPredicate();
         build_tree("not", 1, false);
     }
     else
     {
-        Bp();
+        parseBooleanPredicate();
     }
 }
 
 /**
  * Parses the expression starting with Bp.
  * Handles the grammar rule Bp -> A { comparison_operator A }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Bp()
+void parseBooleanPredicate()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    A();
+    parseArithmeticExpression();
 
     // Check for comparison operators
-    if (tokenStorage.top().nodeValue == "gr" || tokenStorage.top().nodeValue == ">")
+    if (tokenStorage.top().value == "gr" || tokenStorage.top().value == ">")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("gr", 2, false);
     }
-    else if (tokenStorage.top().nodeValue == "ge" || tokenStorage.top().nodeValue == ">=")
+    else if (tokenStorage.top().value == "ge" || tokenStorage.top().value == ">=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("ge", 2, false);
     }
-    else if (tokenStorage.top().nodeValue == "ls" || tokenStorage.top().nodeValue == "<")
+    else if (tokenStorage.top().value == "ls" || tokenStorage.top().value == "<")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("ls", 2, false);
     }
-    else if (tokenStorage.top().nodeValue == "le" || tokenStorage.top().nodeValue == "<=")
+    else if (tokenStorage.top().value == "le" || tokenStorage.top().value == "<=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("le", 2, false);
     }
-    else if (tokenStorage.top().nodeValue == "eq" || tokenStorage.top().nodeValue == "=")
+    else if (tokenStorage.top().value == "eq" || tokenStorage.top().value == "=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("eq", 2, false);
     }
-    else if (tokenStorage.top().nodeValue == "ne" || tokenStorage.top().nodeValue == "!=")
+    else if (tokenStorage.top().value == "ne" || tokenStorage.top().value == "!=")
     {
         tokenStorage.pop();
-        A();
+        parseArithmeticExpression();
         build_tree("ne", 2, false);
     }
 }
@@ -398,45 +396,45 @@ void Bp()
 /**
  * Parses the expression starting with A.
  * Handles the grammar rule A -> + At | - At | At { + At | - At }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void A()
+void parseArithmeticExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
     // Check for unary plus operator
-    if (tokenStorage.top().nodeValue == "+")
+    if (tokenStorage.top().value == "+")
     {
         tokenStorage.pop();
-        At();
+        parseArithmeticTerm();
     }
     // Check for unary minus operator
-    else if (tokenStorage.top().nodeValue == "-")
+    else if (tokenStorage.top().value == "-")
     {
         tokenStorage.pop();
-        At();
+        parseArithmeticTerm();
         build_tree("neg", 1, false);
     }
     else
     {
-        At();
+        parseArithmeticTerm();
     }
 
     // Check for addition and subtraction operators
-    while (tokenStorage.top().nodeValue == "+" || tokenStorage.top().nodeValue == "-")
+    while (tokenStorage.top().value == "+" || tokenStorage.top().value == "-")
     {
-        if (tokenStorage.top().nodeValue == "+")
+        if (tokenStorage.top().value == "+")
         {
             tokenStorage.pop();
-            At();
+            parseArithmeticTerm();
             build_tree("+", 2, false);
         }
-        else if (tokenStorage.top().nodeValue == "-")
+        else if (tokenStorage.top().value == "-")
         {
             tokenStorage.pop();
-            At();
+            parseArithmeticTerm();
             build_tree("-", 2, false);
         }
     }
@@ -445,28 +443,28 @@ void A()
 /**
  * Parses the expression starting with At.
  * Handles the grammar rule At -> Af { * Af | / Af }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void At()
+void parseArithmeticTerm()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Af();
+    parseArithmeticFactor();
 
     // Check for multiplication and division operators
-    while (tokenStorage.top().nodeValue == "*" || tokenStorage.top().nodeValue == "/")
+    while (tokenStorage.top().value == "*" || tokenStorage.top().value == "/")
     {
-        if (tokenStorage.top().nodeValue == "*")
+        if (tokenStorage.top().value == "*")
         {
             tokenStorage.pop();
-            Af();
+            parseArithmeticFactor();
             build_tree("*", 2, false);
         }
-        else if (tokenStorage.top().nodeValue == "/")
+        else if (tokenStorage.top().value == "/")
         {
             tokenStorage.pop();
-            Af();
+            parseArithmeticFactor();
             build_tree("/", 2, false);
         }
     }
@@ -475,20 +473,20 @@ void At()
 /**
  * Parses the expression starting with Af.
  * Handles the grammar rule Af -> Ap { ** Ap }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Af()
+void parseArithmeticFactor()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Ap();
+    parseArithmeticPower();
 
     // Check for exponentiation operator
-    while (tokenStorage.top().nodeValue == "**")
+    while (tokenStorage.top().value == "**")
     {
         tokenStorage.pop();
-        Ap();
+        parseArithmeticPower();
         build_tree("**", 2, false);
     }
 }
@@ -496,32 +494,32 @@ void Af()
 /**
  * Parses the expression starting with Ap.
  * Handles the grammar rule Ap -> R { @ identifier R }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Ap()
+void parseArithmeticPower()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    R();
+    parseAtomicExpression();
 
     // Check for function application operator
-    while (tokenStorage.top().nodeValue == "@")
+    while (tokenStorage.top().value == "@")
     {
         tokenStorage.pop();
 
         // Check for identifier token
-        if (tokenStorage.top().type == type_of_token::IDENTIFIER)
+        if (tokenStorage.top().type == token_type::IDENTIFIER)
         {
             Token token = tokenStorage.pop();
-            build_tree("identifier", 0, true, token.nodeValue);
+            build_tree("identifier", 0, true, token.value);
         }
         else
         {
             throw std::runtime_error("Syntax Error: Identifier expected");
         }
 
-        R();
+        parseAtomicExpression();
         build_tree("@", 3, false);
     }
 }
@@ -529,19 +527,19 @@ void Ap()
 /**
  * Parses the expression starting with R.
  * Handles the grammar rule R -> Rn { Rn }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void R()
+void parseAtomicExpression()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Rn();
+    parseAtomicPrimary();
 
     Token top = tokenStorage.top();
-    while (top.type == type_of_token::IDENTIFIER || top.type == type_of_token::INTEGER || top.type == type_of_token::STRING || top.nodeValue == "true" || top.nodeValue == "false" || top.nodeValue == "nil" || top.nodeValue == "(" || top.nodeValue == "dummy")
+    while (top.type == token_type::IDENTIFIER || top.type == token_type::INTEGER || top.type == token_type::STRING || top.value == "true" || top.value == "false" || top.value == "nil" || top.value == "(" || top.value == "dummy")
     {
-        Rn();
+        parseAtomicPrimary();
         top = tokenStorage.top();
         build_tree("gamma", 2, false);
     }
@@ -550,56 +548,56 @@ void R()
 /**
  * Parses the expression starting with Rn.
  * Handles the grammar rule Rn -> identifier | integer | string | true | false | nil | ( E ) | dummy.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Rn()
+void parseAtomicPrimary()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
     Token top = tokenStorage.top();
 
-    if (top.type == type_of_token::IDENTIFIER)
+    if (top.type == token_type::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
-        build_tree("identifier", 0, true, token.nodeValue);
+        build_tree("identifier", 0, true, token.value);
     }
-    else if (top.type == type_of_token::INTEGER)
+    else if (top.type == token_type::INTEGER)
     {
         // Parse Integer
         Token token = tokenStorage.pop();
-        build_tree("integer", 0, true, token.nodeValue);
+        build_tree("integer", 0, true, token.value);
     }
-    else if (top.type == type_of_token::STRING)
+    else if (top.type == token_type::STRING)
     {
         // Parse String
         Token token = tokenStorage.pop();
-        build_tree("string", 0, true, token.nodeValue);
+        build_tree("string", 0, true, token.value);
     }
-    else if (top.nodeValue == "true")
+    else if (top.value == "true")
     {
         // Parse true
         tokenStorage.pop();
         build_tree("true", 0, true);
     }
-    else if (top.nodeValue == "false")
+    else if (top.value == "false")
     {
         // Parse false
         tokenStorage.pop();
         build_tree("false", 0, true);
     }
-    else if (top.nodeValue == "nil")
+    else if (top.value == "nil")
     {
         // Parse nil
         tokenStorage.pop();
         build_tree("nil", 0, true);
     }
-    else if (top.nodeValue == "(")
+    else if (top.value == "(")
     {
         tokenStorage.pop();
-        E();
-        if (tokenStorage.top().nodeValue == ")")
+        parseExpression();
+        if (tokenStorage.top().value == ")")
         {
             tokenStorage.pop();
         }
@@ -608,7 +606,7 @@ void Rn()
             throw std::runtime_error("Syntax Error: ')' expected");
         }
     }
-    else if (top.nodeValue == "dummy")
+    else if (top.value == "dummy")
     {
         // Parse dummy
         tokenStorage.pop();
@@ -616,26 +614,26 @@ void Rn()
     }
     else
     {
-        throw std::runtime_error("Syntax Error: Identifier, Integer, String, 'true', 'false', 'nil', '(', 'dummy' expected\ngot: " + top.nodeValue);
+        throw std::runtime_error("Syntax Error: Identifier, Integer, String, 'true', 'false', 'nil', '(', 'dummy' expected\ngot: " + top.value);
     }
 }
 
 /**
  * Parses the expression starting with D.
  * Handles the grammar rule D -> Da [ within D ].
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void D()
+void parseDeclaration()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Da();
+    parseDeclarationWithWithinClause();
 
-    while (tokenStorage.top().nodeValue == "within")
+    while (tokenStorage.top().value == "within")
     {
         tokenStorage.pop();
-        D();
+        parseDeclaration();
         build_tree("within", 2, false);
     }
 }
@@ -643,20 +641,20 @@ void D()
 /**
  * Parses the expression starting with Da.
  * Handles the grammar rule Da -> Dr { and Dr }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Da()
+void parseDeclarationWithWithinClause()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
-    Dr();
+    parseRecursiveDeclaration();
     int n = 0;
 
-    while (tokenStorage.top().nodeValue == "and")
+    while (tokenStorage.top().value == "and")
     {
         tokenStorage.pop();
-        Dr();
+        parseRecursiveDeclaration();
         n++;
     }
     if (n > 0) {
@@ -667,43 +665,43 @@ void Da()
 /**
  * Parses the expression starting with Dr.
  * Handles the grammar rule Dr -> rec Db | Db.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Dr()
+void parseRecursiveDeclaration()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
-    if (tokenStorage.top().nodeValue == "rec")
+    if (tokenStorage.top().value == "rec")
     {
         tokenStorage.pop();
-        Db();
+        parseDeclarationBody();
         build_tree("rec", 1, false);
     }
     else
     {
-        Db();
+        parseDeclarationBody();
     }
 }
 
 /**
  * Parses the expression starting with Db.
  * Handles the grammar rule Db -> ( D ) | identifier Vl = E | Vb { , Vb } = E | epsilon.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Db()
+void parseDeclarationBody()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
-    if (tokenStorage.top().nodeValue == "(")
+    if (tokenStorage.top().value == "(")
     {
         tokenStorage.pop();
-        D();
+        parseDeclaration();
 
-        if (tokenStorage.top().nodeValue == ")")
+        if (tokenStorage.top().value == ")")
         {
             tokenStorage.pop();
         }
@@ -712,21 +710,21 @@ void Db()
             throw std::runtime_error("Syntax Error: ')' expected");
         }
     }
-    else if (tokenStorage.top().type == type_of_token::IDENTIFIER)
+    else if (tokenStorage.top().type == token_type::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
-        build_tree("identifier", 0, true, token.nodeValue);
+        build_tree("identifier", 0, true, token.value);
 
-        if (tokenStorage.top().nodeValue == ",")
+        if (tokenStorage.top().value == ",")
         {
             tokenStorage.pop();
-            Vl();
+            parseVariableList();
 
-            if (tokenStorage.top().nodeValue == "=")
+            if (tokenStorage.top().value == "=")
             {
                 tokenStorage.pop();
-                E();
+                parseExpression();
                 build_tree("=", 2, false);
             }
             else
@@ -738,19 +736,19 @@ void Db()
         {
             int n = 0;
 
-            while (tokenStorage.top().nodeValue != "=" && tokenStorage.top().type == type_of_token::IDENTIFIER)
+            while (tokenStorage.top().value != "=" && tokenStorage.top().type == token_type::IDENTIFIER)
             {
-                Vb();
+                parseVariableBinding();
                 n++;
             }
 
-            if (tokenStorage.top().nodeValue == "(")
+            if (tokenStorage.top().value == "(")
             {
                 //                tokenStorage.pop();
-                //                while (tokenStorage.top().nodeValue != ")")
+                //                while (tokenStorage.top().value != ")")
                 //                {
-                //                    Vb();
-                //                    if (tokenStorage.top().nodeValue == ",")
+                //                    parseVariableBinding();
+                //                    if (tokenStorage.top().value == ",")
                 //                    {
                 //                        tokenStorage.pop();
                 //                    }
@@ -762,26 +760,26 @@ void Db()
                 //                    n++;
                 //                }
                 //
-                //                if (tokenStorage.top().nodeValue == ")") {
+                //                if (tokenStorage.top().value == ")") {
                 //                    tokenStorage.pop();
                 //                }
                 //                else {
                 //                    throw std::runtime_error("Syntax Error: ')' expected");
                 //                }
-                Vb();
+                parseVariableBinding();
                 n++;
             }
 
-            if (n == 0 && tokenStorage.top().nodeValue == "=")
+            if (n == 0 && tokenStorage.top().value == "=")
             {
                 tokenStorage.pop();
-                E();
+                parseExpression();
                 build_tree("=", 2, false);
             }
-            else if (n != 0 && tokenStorage.top().nodeValue == "=")
+            else if (n != 0 && tokenStorage.top().value == "=")
             {
                 tokenStorage.pop();
-                E();
+                parseExpression();
                 build_tree("fcn_form", n + 2, false);
             }
             else
@@ -799,46 +797,46 @@ void Db()
 /**
  * Parses the expression starting with Vb.
  * Handles the grammar rule Vb -> identifier | ( ) | ( identifier Vl ).
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Vb()
+void parseVariableBinding()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
-    if (tokenStorage.top().type == type_of_token::IDENTIFIER)
+    if (tokenStorage.top().type == token_type::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
-        build_tree("identifier", 0, true, token.nodeValue);
+        build_tree("identifier", 0, true, token.value);
     }
-    else if (tokenStorage.top().nodeValue == "(")
+    else if (tokenStorage.top().value == "(")
     {
         tokenStorage.pop();
 
-        if (tokenStorage.top().nodeValue == ")")
+        if (tokenStorage.top().value == ")")
         {
             tokenStorage.pop();
             build_tree("()", 0, true);
         }
-        else if (tokenStorage.top().type == type_of_token::IDENTIFIER)
+        else if (tokenStorage.top().type == token_type::IDENTIFIER)
         {
             // Parse Identifier
             Token token = tokenStorage.pop();
-            build_tree("identifier", 0, true, token.nodeValue);
+            build_tree("identifier", 0, true, token.value);
 
-            if (tokenStorage.top().nodeValue == ",")
+            if (tokenStorage.top().value == ",")
             {
                 tokenStorage.pop();
-                Vl();
+                parseVariableList();
             }
             //            else
             //            {
             //                throw std::runtime_error("Syntax Error: ',' expected");
             //            }
 
-            if (tokenStorage.top().nodeValue == ")")
+            if (tokenStorage.top().value == ")")
             {
                 tokenStorage.pop();
             }
@@ -861,26 +859,26 @@ void Vb()
 /**
  * Parses the expression starting with Vl.
  * Handles the grammar rule Vl -> identifier { , identifier }.
- * Constructs the Abstract Syntax CustomTree (AST) nodes and builds the customTree accordingly.
+ * Constructs the Abstract Syntax Tree (AST) nodes and builds the tree accordingly.
  *
  * @throws std::runtime_error if a syntax error occurs.
  */
-void Vl()
+void parseVariableList()
 {
     TokenStorage &tokenStorage = TokenStorage::getInstance();
 
-    if (tokenStorage.top().type == type_of_token::IDENTIFIER)
+    if (tokenStorage.top().type == token_type::IDENTIFIER)
     {
         // Parse Identifier
         Token token = tokenStorage.pop();
-        build_tree("identifier", 0, true, token.nodeValue);
+        build_tree("identifier", 0, true, token.value);
 
         int n = 2;
-        while (tokenStorage.top().nodeValue == ",")
+        while (tokenStorage.top().value == ",")
         {
             tokenStorage.pop();
             token = tokenStorage.pop();
-            build_tree("identifier", 0, true, token.nodeValue);
+            build_tree("identifier", 0, true, token.value);
             n++;
         }
 
@@ -892,4 +890,4 @@ void Vl()
     }
 }
 
-#endif // RPAL_CLION_PARSER_H
+#endif
