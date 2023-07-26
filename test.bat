@@ -49,4 +49,38 @@ echo[
 .\rpal20 testcases/8-t2.rpal
 echo[
 .\rpal20 testcases/8-t3.rpal
+echo[
+.\rpal20 testcases/add
+echo[
+.\rpal20 testcases/conc.1
+echo[
+.\rpal20 testcases/defns.1
+echo[
+.\rpal20 testcases/fn1
+echo[
+.\rpal20 testcases/fn2
+echo[
+.\rpal20 testcases/fn3
+echo[
+.\rpal20 testcases/infix
+echo[
+.\rpal20 testcases/infix2
+echo[
+.\rpal20 testcases/pairs1
+echo[
+.\rpal20 testcases/pairs2
+echo[
+.\rpal20 testcases/pairs3
+echo[
+.\rpal20 testcases/picture
+echo[
+.\rpal20 testcases/pl2018.txt
+echo[
+.\rpal20 testcases/pl2019.txt
+echo[
+.\rpal20 testcases/towers
+echo[
+.\rpal20 testcases/vectorsum
+echo[
+.\rpal20 testcases/z.txt
 pause
