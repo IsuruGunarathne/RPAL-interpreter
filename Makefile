@@ -20,7 +20,7 @@ all: $(TARGET)
 # Linking
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
-	rm -f *.o
+	del /Q *.o
 
 # Compiling source files
 %.o: %.cpp
@@ -31,4 +31,4 @@ $(OBJS): $(HDRS)
 
 # Clean
 clean:
-	rm -f *.o rpal20.exe
+	del /Q *.o rpal20.exe
