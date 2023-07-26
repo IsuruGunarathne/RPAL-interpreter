@@ -4,26 +4,25 @@
 #include <string>
 
 /**
- * Enumeration of token types.
+ * Types of tokens are enumerated.
  */
-enum token_type
+enum type_of_token
 {
-    IDENTIFIER, // Represents an identifier token
-    INTEGER,    // Represents an integer token
-    STRING,     // Represents a string token
-    OPERATOR,   // Represents an operator token
-    DELIMITER,  // Represents a delimiter token
-    KEYWORD,    // Represents a keyword token
-    END_OF_FILE // Represents the end of file token
+    IDENTIFIER, // A token that represents an identifier 
+    INTEGER,    // A token that represents an integer
+    STRING,     // A token that represents a string
+    OPERATOR,   // A token that represents an operator
+    DELIMITER,  // A token that represents a delimiter
+    KEYWORD,    // A token that represents a keyword
+    END_OF_FILE // A token that represents an end of a file
 };
-
 /**
- * Structure representing a token.
+ * A token is represented in the following structure.
  */
 struct Token
 {
-    token_type type;   // The type of the token
-    std::string value; // The value of the token
+    type_of_token type;       // The type of the token
+    std::string nodeValue; // The nodeValue of the token
 };
 
 #endif // TOKEN_H

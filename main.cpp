@@ -7,18 +7,20 @@
 #include "Token.h"
 #include "CSE.h"
 
-// Map the enum values to their string representations
-std::unordered_map<token_type, std::string> token_typeNames = {
-    {token_type::IDENTIFIER, "IDENTIFIER"},
-    {token_type::INTEGER, "INTEGER"},
-    {token_type::STRING, "STRING"},
-    {token_type::OPERATOR, "OPERATOR"},
-    {token_type::DELIMITER, "DELIMITER"},
-    {token_type::KEYWORD, "KEYWORD"},
-    {token_type::END_OF_FILE, "END_OF_FILE"}};
+using namespace std;
 
-// Function to get the string representation of the token_type
-std::string gettoken_typeName(token_type type)
+// Map the enum values to their string representations
+std::unordered_map<type_of_token, std::string> token_typeNames = {
+    {type_of_token::IDENTIFIER, "IDENTIFIER"},
+    {type_of_token::INTEGER, "INTEGER"},
+    {type_of_token::STRING, "STRING"},
+    {type_of_token::OPERATOR, "OPERATOR"},
+    {type_of_token::DELIMITER, "DELIMITER"},
+    {type_of_token::KEYWORD, "KEYWORD"},
+    {type_of_token::END_OF_FILE, "END_OF_FILE"}};
+
+// Function to get the string representation of the type_of_token
+std::string gettoken_typeName(type_of_token type)
 {
     if (token_typeNames.count(type) > 0)
     {
@@ -65,12 +67,12 @@ void printGraphvizWarning()
 /**
  * Helper function to generate the dot file contents recursively.
  *
- * @param node The current TreeNode being processed.
+ * @param node The current CustomTreeNode being processed.
  * @param file The ofstream object for writing the dot file.
  * @param parent The parent node ID (default: -1).
  * @return The ID of the current node.
  */
-int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, int nodeCount = 0)
+int generateDotFileHelper(CustomTreeNode *node, std::ofstream &file, int parent = -1, int nodeCount = 0)
 {
     int currentNode = nodeCount;
 
@@ -82,7 +84,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     std::string valueColor = "darkgreen";
     std::string fillColor = (node->getValue() == " " || node->getValue().empty()) ? "#CCCCCC" : "#FFFFFF";
 
-    // Escape label characters if necessary
+    // Escape labelOfNode characters if necessary
     std::string escapedLabel = node->getLabel();
 
     size_t pos1 = escapedLabel.find('&');
@@ -99,7 +101,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
         pos = escapedLabel.find('>', pos + 4);
     }
 
-    // Prepare label and value strings for the dot file
+    // Prepare labelOfNode and value strings for the dot file
     std::string labelStr = (escapedLabel.empty()) ? "&nbsp;" : escapedLabel;
     std::string valueStr = (node->getValue().empty()) ? "&nbsp;" : node->getValue();
 
@@ -112,7 +114,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     }
 
     // Write the node details to the dot file
-    file << "    node" << currentNode << " [label=<";
+    file << "    node" << currentNode << " [labelOfNode=<";
     file << "<font color=\"" << labelColor << "\">" << labelStr << "</font><br/>";
     file << "<font color=\"" << valueColor << "\">" << valueStr << "</font>";
     file << ">, style=filled, fillcolor=\"" << fillColor << "\"];\n";
@@ -124,7 +126,7 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
     }
 
     // Recursively generate dot file contents for each child node
-    for (TreeNode *child : node->getChildren())
+    for (CustomTreeNode *child : node->getChildren())
     {
         nextNodeCount = generateDotFileHelper(child, file, currentNode, nextNodeCount);
     }
@@ -137,15 +139,15 @@ int generateDotFileHelper(TreeNode *node, std::ofstream &file, int parent = -1, 
  *
  * @param root The root node of the AST.
  */
-void generateDotFile(TreeNode *root, std::string filename)
+void generateDotFile(CustomTreeNode *root, std::string filename)
 {
-    // std::ofstream file("Visualizations/tree.dot");
+    // std::ofstream file("Visualizations/customTree.dot");
      std::string f_name = std::string(R"(D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\)") + filename;
 //    std::string f_name = std::string("Visualizations\\") + filename;
     std::ofstream file(f_name);
     if (file.is_open())
     {
-        file << "digraph Tree {\n";
+        file << "digraph CustomTree {\n";
         generateDotFileHelper(root, file, 0);
         file << "}\n";
         file.close();
@@ -213,24 +215,24 @@ int main(int argc, char *argv[])
 //    {
 //        token = TokenStorage::getInstance().pop();
 //        std::cout << "Type: " << gettoken_typeName(token.type) << ", Value: " << token.value << std::endl;
-//    } while (token.type != token_type::END_OF_FILE);
+//    } while (token.type != type_of_token::END_OF_FILE);
 //
 //    TokenStorage::getInstance().reset();
 
     Parser::parse();
     TokenStorage::destroyInstance();
 
-    TreeNode *root = Tree::getInstance().getASTRoot();
+    CustomTreeNode *root = CustomTree::getInstance().getASTRoot();
 
     if (visualizeAst)
     {
         // Generate the DOT file
         generateDotFile(root, "ast.dot");
 
-        // Tree::releaseASTMemory();
+        // CustomTree::releaseASTMemory();
 
         // // Use Graphviz to generate the graph
-        // system("dot -Tpng Visualizations\\tree.dot -o Visualizations\\tree.png");
+        // system("dot -Tpng Visualizations\\customTree.dot -o Visualizations\\customTree.png");
 
          std::string dotFilePath = R"("D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\ast.dot")";
          std::string outputFilePath = R"("D:\Files\Academics\Semester_04\PL\RPAL_CLION\Visualizations\ast.png")";
@@ -241,12 +243,12 @@ int main(int argc, char *argv[])
         std::string command = "dot -Tpng -Gdpi=150 " + dotFilePath + " -o " + outputFilePath;
         system(command.c_str());
 
-        // tree.png folder path message
+        // customTree.png folder path message
         std::cout << "The ast.png file is located in the Visualizations folder." << std::endl;
     }
 
-    Tree::generate();
-    TreeNode *st_root = Tree::getInstance().getSTRoot();
+    CustomTree::generate();
+    CustomTreeNode *st_root = CustomTree::getInstance().getSTRoot();
 
     if (visualizeSt)
     {
@@ -265,7 +267,7 @@ int main(int argc, char *argv[])
     }
 
     CSE cse = CSE();
-    cse.create_cs(Tree::getInstance().getSTRoot());
+    cse.create_cs(CustomTree::getInstance().getSTRoot());
     cse.evaluate();
 
     std::cout << std::endl;
